@@ -22,6 +22,19 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     database: mysql
 
+#AWS
+cloud:
+  aws:
+    credentials:
+      access-key: ENC(UqR1eGsoVsbylYWooGtYNhoffn86UB+gIxVFFQyTvRM=)
+      secret-key: ENC(V+wMLAraR2Y1mNTiARqxlqoEykxZLXWvsO/abSeE+N8r4YIsEHD23U37K3CZmLL173vY9tASkEc=)
+    s3:
+      bucket: frost0807
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+
 #yml추가
   config:
     import: jasypt.yml
@@ -31,5 +44,3 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
-
-#AWS
