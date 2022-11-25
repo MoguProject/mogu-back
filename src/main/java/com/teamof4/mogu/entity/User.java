@@ -1,22 +1,28 @@
 package com.teamof4.mogu.entity;
 
+import com.teamof4.mogu.dto.UserDto;
+import com.teamof4.mogu.dto.UserDto.LoginResponse;
+import com.teamof4.mogu.security.TokenProvider;
+import com.teamof4.mogu.security.TokenService;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class User extends BaseTimeEntity{
+public class User extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "user")
+    @ManyToOne
     private Image image;
 
     private String email;
@@ -51,25 +57,14 @@ public class User extends BaseTimeEntity{
 //    @OneToMany(mappedBy = "user")
 //    private List<Reply> replies = new ArrayList<>();
 
-    @Builder
-    public User(Long id, Image image, String email, String name, String nickname,
-                String password, String phone, Boolean isDeleted, Boolean isActivated,
-                String preferredMethod, String region, String information) {
-        this.id = id;
-        this.image = image;
-        this.email = email;
-        this.name = name;
-        this.nickname = nickname;
-        this.password = password;
-        this.phone = phone;
-        this.isDeleted = isDeleted;
-        this.isActivated = isActivated;
-        this.preferredMethod = preferredMethod;
-        this.region = region;
-        this.information = information;
-    }
-
     public void setImage(Image image) {
         this.image = image;
+    }
+
+    public LoginResponse toLoginResponse() {
+
+        return LoginResponse.builder()
+                .profileImageUrl(this.image.getImageUrl())
+                .build();
     }
 }

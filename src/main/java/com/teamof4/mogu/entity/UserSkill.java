@@ -11,13 +11,11 @@ import javax.persistence.Id;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class UserSkill {
 
     @Id
     @GeneratedValue
     private Long id;
-
-    private User user;
 }

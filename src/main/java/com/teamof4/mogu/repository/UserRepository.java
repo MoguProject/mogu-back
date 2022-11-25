@@ -3,11 +3,17 @@ package com.teamof4.mogu.repository;
 import com.teamof4.mogu.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+import java.util.Optional;
 
-    boolean existByEmail(String email);
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    boolean existByNickname(String nickname);
+    Optional<User> findByEmail(String email);
 
-    boolean existByPhone(String phone);
+    boolean existsByEmail(String email);
+
+    boolean existsByNickname(String nickname);
+
+    boolean existsByPhone(String phone);
+
+    boolean existsByEmailAndPassword(String email, String password);
 }

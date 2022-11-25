@@ -2,9 +2,9 @@ package com.teamof4.mogu.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -12,10 +12,13 @@ import javax.persistence.Id;
 public class Image {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String imageUrl;
+
+    @OneToMany(mappedBy = "image")
+    private List<User> users = new ArrayList<>();
 
     @Builder
     public Image(Long id, String imageUrl) {

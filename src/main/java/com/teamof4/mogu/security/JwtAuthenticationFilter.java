@@ -3,6 +3,7 @@ package com.teamof4.mogu.security;
 import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Marker;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -52,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.error("Could not set user authentication in security context", e);
             log.info("토큰 에러");
         }
+        filterChain.doFilter(request, response);
     }
 
     private String parsBearerToken(HttpServletRequest httpServletRequest) {

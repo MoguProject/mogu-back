@@ -1,18 +1,15 @@
 package com.teamof4.mogu.dto;
 
-import com.teamof4.mogu.entity.PreferredMethod;
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.util.encryption.EncryptionService;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
+import static com.teamof4.mogu.constants.RegexConstants.PASSWORD;
 import static com.teamof4.mogu.constants.RegexConstants.PHONE;
 
 public class UserDto {
@@ -26,7 +23,8 @@ public class UserDto {
         private String email;
 
         @NotBlank(message = "비밀번호를 입력해주세요")
-        @Size(min = 8, max = 30, message = "비밀번호는 8자 이상 30자 이하로 입력해주세요")
+        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
+        @Pattern(regexp = PASSWORD, message = "숫자, 문자, 특수문자 중 2가지를 조합해 입력해주세요")
         private String password;
 
         @NotBlank(message = "닉네임을 입력해주세요")
@@ -41,18 +39,6 @@ public class UserDto {
         @Pattern(regexp = PHONE, message = "올바른 휴대폰번호를 입력해주세요")
         private String phone;
 
-        @NotBlank(message = "진행방식을 입력해주세요")
-        private String preferredMethod;
-
-        @NotBlank(message = "지역을 입력해주세요")
-        private String region;
-
-        @NotBlank(message = "자기소개를 입력해주세요")
-        @Size(max = 200, message = "200자 이하로 입력해주세요")
-        private String information;
-
-        @NotBlank(message = "공개여부를 선택해주세요")
-        private Boolean isActivated;
 
         //userDTo의 비밀번호를 BCrypt방식으로 암호화
         public void encryptPassword(EncryptionService encryptionService) {
@@ -60,19 +46,45 @@ public class UserDto {
         }
 
         public User toEntity() {
+
             return User.builder()
                     .email(this.email)
                     .name(this.name)
                     .nickname(this.nickname)
                     .password(this.password)
                     .phone(this.phone)
-                    .preferredMethod(this.preferredMethod)
-                    .region(this.region)
-                    .isActivated(this.isActivated)
+                    .preferredMethod("NOTENTERED")
+                    .region("NOTENTERED")
+                    .information("NOTENTERED")
+                    .isActivated(true)
                     .isDeleted(false)
                     .build();
         }
 
     }
 
+    @Getter
+    public static class LoginRequest {
+
+        private String email;
+
+        private String password;
+
+        public boolean checkPassword(EncryptionService encryptionService, String encryptedPassword) {
+            return encryptionService.isSamePassword(this.password, encryptedPassword);
+        }
+    }
+
+    @Builder
+    @Getter
+    public static class LoginResponse {
+
+        private String profileImageUrl;
+
+        private String token;
+
+        public void createToken(String token) {
+            this.token = token;
+        }
+    }
 }

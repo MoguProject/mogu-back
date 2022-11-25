@@ -1,7 +1,9 @@
 package com.teamof4.mogu.util.encryption;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BCryptionService implements EncryptionService {
 
     @Override

@@ -11,8 +11,7 @@ spring:
     hibernate:
       ddl-auto: none
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     generate-ddl: false
     properties:
       hibernate:
@@ -22,22 +21,11 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     database: mysql
 
-#AWS
-cloud:
-  aws:
-    credentials:
-      access-key: ENC(UqR1eGsoVsbylYWooGtYNhoffn86UB+gIxVFFQyTvRM=)
-      secret-key: ENC(V+wMLAraR2Y1mNTiARqxlqoEykxZLXWvsO/abSeE+N8r4YIsEHD23U37K3CZmLL173vY9tASkEc=)
-    s3:
-      bucket: frost0807
-    stack:
-      auto: false
-    region:
-      static: ap-northeast-2
-
 #yml추가
   config:
     import: jasypt.yml
+
+
 
 #LOG
 logging:

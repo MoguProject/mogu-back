@@ -2,7 +2,6 @@ package com.teamof4.mogu.config;
 
 import com.teamof4.mogu.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.filters.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,14 +20,17 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((auth) -> auth
+        http
+                .authorizeHttpRequests((authz) -> authz
                         .anyRequest().authenticated()
                 )
                 .httpBasic().disable()
                 .csrf().disable()
                 .cors()
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .formLogin();
 
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
         return http.build();
@@ -35,6 +38,6 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().antMatchers("/", "/**");
+        return (web) -> web.ignoring().antMatchers("/", "/**");
     }
 }
