@@ -11,8 +11,7 @@ spring:
     hibernate:
       ddl-auto: none
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     generate-ddl: false
     properties:
       hibernate:
@@ -26,10 +25,10 @@ spring:
   config:
     import: jasypt.yml
 
+
+
 #LOG
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
-
-#AWS
