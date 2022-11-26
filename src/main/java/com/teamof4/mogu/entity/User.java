@@ -45,9 +45,9 @@ public class User extends BaseTimeEntity {
 
     private String information;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<UserSkill> userSkills = new ArrayList<>();
-//
+    @OneToMany(mappedBy = "user")
+    private List<UserSkill> userSkills = new ArrayList<>();
+
 //    @OneToMany(mappedBy = "user")
 //    private List<PostLiked> postLikeds = new ArrayList<>();
 //
