@@ -2,12 +2,11 @@ package com.teamof4.mogu.dto;
 
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.util.encryption.EncryptionService;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.*;
+
+import java.util.List;
 
 import static com.teamof4.mogu.constants.RegexConstants.PASSWORD;
 import static com.teamof4.mogu.constants.RegexConstants.PHONE;
@@ -86,5 +85,31 @@ public class UserDto {
         public void createToken(String token) {
             this.token = token;
         }
+    }
+
+    @Getter
+    @Builder
+    public static class UserInfoResponse {
+
+        private String profileImageUrl;
+
+        private String email;
+
+        private String name;
+
+        private String nickname;
+
+        private String phone;
+
+        private boolean isActivated;
+
+        private String preferredMethod;
+
+        private String region;
+
+        private String information;
+
+        private List<String> skills;
+
     }
 }

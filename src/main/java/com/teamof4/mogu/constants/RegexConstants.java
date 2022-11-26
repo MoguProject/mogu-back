@@ -6,5 +6,5 @@ public class RegexConstants {
      * */
 
     public static final String PHONE = "^(01[016789]\\d{3,4}\\d{4})$";
-    public static final String PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
+    public static final String PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,20}$";
 }

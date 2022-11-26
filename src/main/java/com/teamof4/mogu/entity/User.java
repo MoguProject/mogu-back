@@ -2,6 +2,7 @@ package com.teamof4.mogu.entity;
 
 import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
+import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
 import com.teamof4.mogu.security.TokenProvider;
 import com.teamof4.mogu.security.TokenService;
 import lombok.*;
@@ -10,6 +11,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Builder
@@ -23,6 +27,7 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "image_id")
     private Image image;
 
     private String email;
@@ -45,7 +50,7 @@ public class User extends BaseTimeEntity {
 
     private String information;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = LAZY)
     private List<UserSkill> userSkills = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "user")
@@ -62,9 +67,31 @@ public class User extends BaseTimeEntity {
     }
 
     public LoginResponse toLoginResponse() {
-
         return LoginResponse.builder()
                 .profileImageUrl(this.image.getImageUrl())
                 .build();
+    }
+
+    public UserInfoResponse toUserInfoResponse() {
+        return UserInfoResponse.builder()
+                .profileImageUrl(this.image.getImageUrl())
+                .email(this.email)
+                .name(this.name)
+                .nickname(this.nickname)
+                .phone(this.phone)
+                .isActivated(this.isActivated)
+                .preferredMethod(this.preferredMethod)
+                .region(this.region)
+                .information(this.information)
+                .skills(getUserSkillNames())
+                .build();
+    }
+
+    public List<String> getUserSkillNames() {
+        return this.userSkills
+                .stream()
+                .map(UserSkill::getSkill)
+                .map(Skill::getSkillName)
+                .collect(Collectors.toList());
     }
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,9 +34,18 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest requestDto) {
-
         LoginResponse loginResponse = userService.login(requestDto);
 
         return ResponseEntity.ok(loginResponse);
     }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<UserInfoResponse> getMyPageInformation(
+            @AuthenticationPrincipal String userId) {
+        UserInfoResponse userInfoResponse = userService.getMyPageInformation(Long.parseLong(userId));
+        System.out.println(userInfoResponse.toString());
+
+        return ResponseEntity.ok(userInfoResponse);
+    }
+
 }
