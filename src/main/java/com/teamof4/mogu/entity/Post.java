@@ -3,16 +3,15 @@ package com.teamof4.mogu.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
+@AllArgsConstructor
 public class Post extends BaseTimeEntity {
 
     @Id
@@ -37,16 +36,6 @@ public class Post extends BaseTimeEntity {
     private int view;
 
     private boolean isDeleted;
-
-    public Post(Long id, User user, Category category, String title, String content, int view, boolean isDeleted) {
-        this.id = id;
-        this.user = user;
-        this.category = category;
-        this.title = title;
-        this.content = content;
-        this.view = view;
-        this.isDeleted = isDeleted;
-    }
 
     public void setUser(User user) {
         this.user = user;

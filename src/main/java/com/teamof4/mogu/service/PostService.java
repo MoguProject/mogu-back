@@ -2,7 +2,6 @@ package com.teamof4.mogu.service;
 
 import com.amazonaws.util.CollectionUtils;
 import com.teamof4.mogu.dto.PostDTO;
-import com.teamof4.mogu.dto.ProjectStudyDTO;
 import com.teamof4.mogu.entity.*;
 import com.teamof4.mogu.exception.category.CategoryNotFoundException;
 import com.teamof4.mogu.exception.post.PostNotFoundException;
@@ -10,7 +9,6 @@ import com.teamof4.mogu.exception.user.UserNotFoundException;
 import com.teamof4.mogu.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
