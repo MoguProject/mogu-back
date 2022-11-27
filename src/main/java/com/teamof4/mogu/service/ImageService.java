@@ -19,6 +19,8 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final AwsS3Service awsS3Service;
 
+    private final int SPLIT_INDEX = 50;
+
     @Transactional
     public Image saveProfileImage(MultipartFile profileImage) {
         if(profileImage.isEmpty()) {
@@ -30,5 +32,23 @@ public class ImageService {
         Image image = saveRequest.toEntity();
 
         return imageRepository.save(image);
+    }
+
+    @Transactional
+    public Image savePostImage(MultipartFile profileImage) {
+
+        String imageUrl = awsS3Service.uploadProfileImage(profileImage);
+        Image image = Image.builder()
+                .imageUrl(imageUrl)
+                .build();
+
+        return imageRepository.save(image);
+    }
+
+    @Transactional
+    public void deleteImage(Image targetTmage) {
+        String fileName = targetTmage.getImageUrl().substring(SPLIT_INDEX);
+        awsS3Service.deleteImage(fileName);
+        imageRepository.delete(targetTmage);
     }
 }

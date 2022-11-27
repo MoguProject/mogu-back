@@ -2,6 +2,7 @@ package com.teamof4.mogu.util.aws;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.teamof4.mogu.exception.image.FailedImageConvertException;
 import com.teamof4.mogu.exception.image.FailedImageUploadException;
@@ -42,6 +43,10 @@ public class AwsS3Service {
         String uploadImageUrl = putS3(uploadFile, fileName);
         removeNewFile(uploadFile);
         return uploadImageUrl;
+    }
+
+    public void deleteImage(String fileName) {
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
     private String putS3(File uploadFile, String fileName) {
