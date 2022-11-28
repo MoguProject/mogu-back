@@ -27,7 +27,7 @@ public class UserDto {
         private String password;
 
         @NotBlank(message = "닉네임을 입력해주세요")
-        @Size(min = 2, max = 12, message = "닉네임은 3자 이상 12자 이하로 입력해주세요")
+        @Size(min = 3, max = 12, message = "닉네임은 3자 이상 12자 이하로 입력해주세요")
         private String nickname;
 
         @NotBlank(message = "이름을 입력해주세요")

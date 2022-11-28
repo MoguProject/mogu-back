@@ -1,6 +1,9 @@
 package com.teamof4.mogu.service;
 
 import com.teamof4.mogu.dto.UserDto.*;
+import com.teamof4.mogu.dto.UserDto.LoginRequest;
+import com.teamof4.mogu.dto.UserDto.LoginResponse;
+import com.teamof4.mogu.dto.UserDto.SaveRequest;
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.exception.user.UserNotFoundException;
 import com.teamof4.mogu.exception.user.DuplicatedEmailException;
