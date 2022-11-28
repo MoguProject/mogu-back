@@ -1,7 +1,7 @@
 package com.teamof4.mogu.service;
 
 import com.amazonaws.util.CollectionUtils;
-import com.teamof4.mogu.dto.PostDTO;
+import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.entity.*;
 import com.teamof4.mogu.exception.category.CategoryNotFoundException;
 import com.teamof4.mogu.exception.post.PostNotFoundException;
@@ -29,16 +29,34 @@ public class PostService {
     private final ImagePostRepository imagePostRepository;
     private final ImageService imageService;
 
-    public List<PostDTO.ListResponse> getPostList() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream()
-                .filter(post -> !post.isDeleted())
-                .map(PostDTO.ListResponse::new).collect(Collectors.toList());
+    public List<PostDto.Response> getPostList() {
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc().stream()
+                .filter(post -> !post.isDeleted()).collect(Collectors.toList());
+
+        List<PostDto.Response> responseList = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostDto.Response response = PostDto.Response.builder()
+                    .post(post)
+                    .images(getImages(post.getId())).build();
+            responseList.add(response);
+        }
+        return responseList;
     }
 
-    public PostDTO.Response getPostDetails(Long postId) {
+    public PostDto.Response getPostDetails(Long postId) {
 
         Post post = getPost(postId);
 
+        List<Image> images = getImages(postId);
+
+        return PostDto.Response.builder()
+                .post(post)
+                .images(images).build();
+
+    }
+
+    private List<Image> getImages(Long postId) {
         List<ImagePost> imagePosts = imagePostRepository.findAllByPostId(postId);
 
         List<Image> images = new ArrayList<>();
@@ -47,15 +65,11 @@ public class PostService {
             images = imagePosts.stream().map(ImagePost::getImage).collect(Collectors.toList());
 
         }
-
-        return PostDTO.Response.builder()
-                .post(post)
-                .images(images).build();
-
+        return images;
     }
 
     @Transactional
-    public Long savePost(PostDTO.SaveRequest requestDTO) {
+    public Long savePost(PostDto.SaveRequest requestDTO) {
 
         Post post = requestDTO.toEntity(getUser(requestDTO.getUserId()), getCategory(requestDTO.getCategoryId()));
 
@@ -70,7 +84,7 @@ public class PostService {
     }
 
     @Transactional
-    public Long updatePost(Long postId, PostDTO.UpdateRequest requestDTO) {
+    public Long updatePost(Long postId, PostDto.UpdateRequest requestDTO) {
 
         Post post = getPost(postId);
         post.updatePost(requestDTO.getTitle(), requestDTO.getContent());
