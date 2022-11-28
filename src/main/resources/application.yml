@@ -5,8 +5,11 @@ spring:
     url: jdbc:mysql://121.130.79.104:3306/mogu?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: mogu
     password: ENC(wSQhN8p5Eqd/bqi0w2ewmFZZDf5hvBTj)
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
-#JPA
+  #JPA
   jpa:
     hibernate:
       ddl-auto: none
