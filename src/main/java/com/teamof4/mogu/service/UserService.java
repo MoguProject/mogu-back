@@ -1,6 +1,5 @@
 package com.teamof4.mogu.service;
 
-import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.LoginRequest;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
@@ -15,7 +14,6 @@ import com.teamof4.mogu.security.TokenProvider;
 import com.teamof4.mogu.util.encryption.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;

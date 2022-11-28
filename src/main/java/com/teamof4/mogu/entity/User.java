@@ -1,14 +1,10 @@
 package com.teamof4.mogu.entity;
 
-import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
 import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
-import com.teamof4.mogu.security.TokenProvider;
-import com.teamof4.mogu.security.TokenService;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
