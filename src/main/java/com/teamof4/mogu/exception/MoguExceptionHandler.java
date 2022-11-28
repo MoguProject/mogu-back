@@ -64,7 +64,7 @@ public class MoguExceptionHandler {
     }
 
     @ExceptionHandler(BindException.class)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(BindException exception) {
+    public ResponseEntity<Map<String, String>> handleBindException(BindException exception) {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getAllErrors()
                 .forEach(e -> errors.put(((FieldError) e).getField(), e.getDefaultMessage()));
