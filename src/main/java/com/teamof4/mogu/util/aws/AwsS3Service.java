@@ -27,7 +27,7 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadProfileImage(MultipartFile multipartFile) {
+    public String uploadImage(MultipartFile multipartFile) {
         try {
             File uploadFile = convert(multipartFile)
                     .orElseThrow(() -> new FailedImageConvertException());

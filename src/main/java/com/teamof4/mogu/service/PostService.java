@@ -24,16 +24,14 @@ public class PostService {
 
 
     private final PostRepository postRepository;
-    private final ProjectStudyRepository projectStudyRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-
     private final ImagePostRepository imagePostRepository;
-
     private final ImageService imageService;
 
     public List<PostDTO.ListResponse> getPostList() {
         return postRepository.findAllByOrderByCreatedAtDesc().stream()
+                .filter(post -> !post.isDeleted())
                 .map(PostDTO.ListResponse::new).collect(Collectors.toList());
     }
 

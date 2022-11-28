@@ -19,7 +19,7 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final AwsS3Service awsS3Service;
 
-    private final int SPLIT_INDEX = 50;
+    private final int SPLIT_INDEX = 57;
 
     @Transactional
     public Image saveProfileImage(MultipartFile profileImage) {
@@ -27,7 +27,7 @@ public class ImageService {
             return imageRepository.findById(1L)
                     .orElseThrow(() -> new FailedImageUploadException("기본 이미지를 찾지 못했습니다."));
         }
-        String imageUrl = awsS3Service.uploadProfileImage(profileImage);
+        String imageUrl = awsS3Service.uploadImage(profileImage);
         SaveRequest saveRequest = new SaveRequest(imageUrl);
         Image image = saveRequest.toEntity();
 
@@ -37,7 +37,7 @@ public class ImageService {
     @Transactional
     public Image savePostImage(MultipartFile profileImage) {
 
-        String imageUrl = awsS3Service.uploadProfileImage(profileImage);
+        String imageUrl = awsS3Service.uploadImage(profileImage);
         Image image = Image.builder()
                 .imageUrl(imageUrl)
                 .build();
