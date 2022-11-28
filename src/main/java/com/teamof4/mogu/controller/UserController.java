@@ -55,4 +55,13 @@ public class UserController {
         return OK;
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> delete(@RequestBody DeleteRequest requestDto,
+                                       @AuthenticationPrincipal Long userId) {
+        userService.delete(requestDto, userId);
+
+        return OK;
+    }
+
+
 }

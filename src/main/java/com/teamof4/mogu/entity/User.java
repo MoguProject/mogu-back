@@ -91,4 +91,8 @@ public class User extends BaseTimeEntity {
                 .map(Skill::getSkillName)
                 .collect(Collectors.toList());
     }
+
+    public void deleteUser() {
+        this.isDeleted = true;
+    }
 }

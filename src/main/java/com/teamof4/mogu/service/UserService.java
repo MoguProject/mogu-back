@@ -5,10 +5,7 @@ import com.teamof4.mogu.dto.UserDto.LoginRequest;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
 import com.teamof4.mogu.entity.User;
-import com.teamof4.mogu.exception.user.UserNotFoundException;
-import com.teamof4.mogu.exception.user.DuplicatedEmailException;
-import com.teamof4.mogu.exception.user.DuplicatedNicknameException;
-import com.teamof4.mogu.exception.user.DuplicatedPhoneException;
+import com.teamof4.mogu.exception.user.*;
 import com.teamof4.mogu.repository.UserRepository;
 import com.teamof4.mogu.security.TokenProvider;
 import com.teamof4.mogu.util.encryption.EncryptionService;
@@ -91,11 +88,9 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
 
-
         if (!profileImage.isEmpty()) {
             user.setImage(imageService.updateProfileImage(profileImage));
         }
-
     }
 
     @Transactional(readOnly = true)
@@ -107,5 +102,19 @@ public class UserService {
         if (userRepository.existsByPhone(requestDto.getPhone())) {
             throw new DuplicatedPhoneException();
         }
+    }
+
+    @Transactional
+    public void delete(DeleteRequest requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
+
+        if (!requestDto.checkPassword(encryptionService, user.getPassword())) {
+            throw new WrongPasswordException();
+        }
+
+        user.deleteUser();
+
+        userRepository.save(user);
     }
 }

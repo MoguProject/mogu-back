@@ -2,10 +2,7 @@ package com.teamof4.mogu.exception;
 
 import com.teamof4.mogu.exception.image.FailedImageUploadException;
 import com.teamof4.mogu.exception.image.FailedImageConvertException;
-import com.teamof4.mogu.exception.user.DuplicatedEmailException;
-import com.teamof4.mogu.exception.user.DuplicatedNicknameException;
-import com.teamof4.mogu.exception.user.DuplicatedPhoneException;
-import com.teamof4.mogu.exception.user.UserNotFoundException;
+import com.teamof4.mogu.exception.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -47,6 +44,13 @@ public class MoguExceptionHandler {
     public final ResponseEntity<String> handleUserNotFoundException(
             UserNotFoundException exception) {
         return USER_NOT_FOUND;
+    }
+
+    @ExceptionHandler(WrongPasswordException.class)
+    public final ResponseEntity<String> handleWrongPasswordException(
+            WrongPasswordException exception) {
+        log.debug("잘못된 비밀번호입니다.");
+        return WRONG_PASSWORD;
     }
 
     @ExceptionHandler(FailedImageConvertException.class)

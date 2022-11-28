@@ -148,4 +148,14 @@ public class UserDto {
         @NotBlank
         private List<String> skills;
     }
+
+    @Getter
+    public static class DeleteRequest {
+        @NotBlank(message = "비밀번호를 입력해주세요")
+        private String password;
+
+        public boolean checkPassword(EncryptionService encryptionService, String encryptedPassword) {
+            return encryptionService.isSamePassword(this.password, encryptedPassword);
+        }
+    }
 }
