@@ -3,9 +3,9 @@ package com.teamof4.mogu.dto;
 import com.teamof4.mogu.entity.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,19 +16,24 @@ public class PostDTO {
     public static class SaveRequest {
 
         private Long userId;
+
+        @NotBlank(message = "카테고리를 선택해 주세요.")
         private Long categoryId;
+
+        @NotBlank(message = "제목을 입력해 주세요.")
         private String title;
+
+        @NotBlank(message = "내용을 입력해 주세요.")
         private String content;
+
         private List<MultipartFile> multipartFiles;
 
         public Post toEntity(User user, Category category) {
-            Post post = new Post();
-            post.setUser(user);
-            post.setCategory(category);
-            post.setTitle(title);
-            post.setContent(content);
-
-            return post;
+            return Post.builder()
+                    .user(user)
+                    .category(category)
+                    .title(title)
+                    .content(content).build();
         }
 
     }
@@ -37,8 +42,12 @@ public class PostDTO {
     @Builder
     public static class UpdateRequest {
 
+        @NotBlank(message = "제목을 입력해 주세요.")
         private String title;
+
+        @NotBlank(message = "내용을 입력해 주세요.")
         private String content;
+
         private List<MultipartFile> multipartFiles;
 
     }

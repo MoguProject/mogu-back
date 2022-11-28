@@ -8,8 +8,13 @@ import com.teamof4.mogu.exception.user.DuplicatedPhoneException;
 import com.teamof4.mogu.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.teamof4.mogu.constants.ResponseConstants.*;
 
@@ -56,6 +61,15 @@ public class MoguExceptionHandler {
             FailedImageUploadException exception) {
         log.debug("이미지 업로드에 실패했습니다.", exception);
         return FAILED_IMAGE_UPLOAD;
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(BindException exception) {
+        Map<String, String> errors = new HashMap<>();
+        exception.getBindingResult().getAllErrors()
+                .forEach(e -> errors.put(((FieldError) e).getField(), e.getDefaultMessage()));
+        log.debug("erros = {}", errors);
+        return ResponseEntity.badRequest().body(errors);
     }
 
 }

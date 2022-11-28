@@ -3,11 +3,10 @@ package com.teamof4.mogu.controller;
 import com.teamof4.mogu.dto.PostDTO;
 import com.teamof4.mogu.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,12 +27,12 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Long> savePost(PostDTO.SaveRequest dto) {
+    public ResponseEntity<Long> savePost(@Valid PostDTO.SaveRequest dto) {
         return ResponseEntity.ok(postService.savePost(dto));
     }
 
     @PostMapping("/update/{postId}")
-    public ResponseEntity<Long> updatePost(@PathVariable Long postId, PostDTO.UpdateRequest dto) {
+    public ResponseEntity<Long> updatePost(@PathVariable Long postId, @Valid PostDTO.UpdateRequest dto) {
         return ResponseEntity.ok(postService.updatePost(postId, dto));
     }
 
