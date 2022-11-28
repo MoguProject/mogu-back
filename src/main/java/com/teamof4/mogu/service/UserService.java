@@ -1,10 +1,6 @@
 package com.teamof4.mogu.service;
 
-import com.teamof4.mogu.dto.UserDto;
-import com.teamof4.mogu.dto.UserDto.LoginRequest;
-import com.teamof4.mogu.dto.UserDto.LoginResponse;
-import com.teamof4.mogu.dto.UserDto.SaveRequest;
-import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
+import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.exception.user.UserNotFoundException;
 import com.teamof4.mogu.exception.user.DuplicatedEmailException;
@@ -15,7 +11,6 @@ import com.teamof4.mogu.security.TokenProvider;
 import com.teamof4.mogu.util.encryption.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,23 +23,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final ImageService imageService;
     private final EncryptionService encryptionService;
-
     private final TokenProvider tokenProvider;
 
     @Transactional
     public void save(SaveRequest requestDto, MultipartFile profileImage) {
-        if (!checkDuplicated(requestDto)) {
-            requestDto.encryptPassword(encryptionService);
+        checkDuplicatedForCreate(requestDto);
 
-            User user = requestDto.toEntity();
-            user.setImage(imageService.saveProfileImage(profileImage));
+        requestDto.encryptPassword(encryptionService);
+        User user = requestDto.toEntity();
+        user.setImage(imageService.saveProfileImage(profileImage));
 
-            userRepository.save(user);
-        }
+        userRepository.save(user);
     }
 
+
     @Transactional(readOnly = true)
-    public boolean checkDuplicated(SaveRequest requestDto) {
+    public void checkDuplicatedForCreate(SaveRequest requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
             throw new DuplicatedEmailException();
         }
@@ -56,8 +50,6 @@ public class UserService {
         if (userRepository.existsByPhone(requestDto.getPhone())) {
             throw new DuplicatedPhoneException();
         }
-
-        return false;
     }
 
     @Transactional
@@ -65,7 +57,7 @@ public class UserService {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
 
-        if(user.getIsDeleted()) {
+        if (user.getIsDeleted()) {
             throw new UserNotFoundException("탈퇴한 회원입니다.");
         }
 
@@ -88,5 +80,29 @@ public class UserService {
         UserInfoResponse userInfoResponse = user.toUserInfoResponse();
 
         return userInfoResponse;
+    }
+
+    public void update(UpdateRequest updateRequest, MultipartFile profileImage, Long userId) {
+        checkDuplicatedForUpdate(updateRequest);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
+
+
+        if (!profileImage.isEmpty()) {
+            user.setImage(imageService.updateProfileImage(profileImage));
+        }
+
+    }
+
+    @Transactional(readOnly = true)
+    public void checkDuplicatedForUpdate(UpdateRequest requestDto) {
+        if (userRepository.existsByNickname(requestDto.getNickname())) {
+            throw new DuplicatedNicknameException();
+        }
+
+        if (userRepository.existsByPhone(requestDto.getPhone())) {
+            throw new DuplicatedPhoneException();
+        }
     }
 }

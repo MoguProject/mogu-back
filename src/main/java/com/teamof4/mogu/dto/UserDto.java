@@ -62,6 +62,7 @@ public class UserDto {
 
     }
 
+    @ToString
     @Getter
     public static class LoginRequest {
 
@@ -77,6 +78,8 @@ public class UserDto {
     @Builder
     @Getter
     public static class LoginResponse {
+
+        private String nickname;
 
         private String profileImageUrl;
 
@@ -111,5 +114,38 @@ public class UserDto {
 
         private List<String> skills;
 
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class UpdateRequest {
+
+        @NotBlank(message = "비밀번호를 입력해주세요")
+        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
+        @Pattern(regexp = PASSWORD, message = "숫자, 문자, 특수문자 3가지를 조합해 입력해주세요")
+        private String password;
+
+        @NotBlank(message = "닉네임을 입력해주세요")
+        @Size(min = 2, max = 12, message = "닉네임은 3자 이상 12자 이하로 입력해주세요")
+        private String nickname;
+
+        @NotBlank(message = "휴대폰 번호를 입력해주세요")
+        @Pattern(regexp = PHONE, message = "올바른 휴대폰번호를 입력해주세요")
+        private String phone;
+
+        @NotBlank
+        private boolean isActivated;
+
+        @NotBlank
+        private String preferredMethod;
+
+        @NotBlank
+        private String region;
+
+        @NotBlank
+        private String information;
+
+        @NotBlank
+        private List<String> skills;
     }
 }

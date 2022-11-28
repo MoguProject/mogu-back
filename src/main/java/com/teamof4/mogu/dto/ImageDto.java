@@ -5,20 +5,15 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
+@Getter
 public class ImageDto {
 
-    @Getter
-    @AllArgsConstructor
-    public static class SaveRequest {
+    @NotBlank(message = "이미지 URL이 비어있습니다")
+    private String imageUrl;
 
-        @NotBlank(message = "이미지 URL이 비어있습니다")
-        private String imageUrl;
-
-        public Image toEntity() {
-            return Image.builder()
-                    .imageUrl(this.imageUrl)
-                    .build();
-        }
+    public static Image of(String imageUrl) {
+        return Image.builder()
+                .imageUrl(imageUrl)
+                .build();
     }
-
 }
