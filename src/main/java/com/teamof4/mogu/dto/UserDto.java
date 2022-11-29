@@ -76,9 +76,11 @@ public class UserDto {
     @Getter
     public static class LoginRequest {
 
+        @NotBlank(message = "이메일 주소를 입력해주세요")
         @ApiParam(value = "회원 이메일")
         private String email;
 
+        @NotBlank(message = "비밀번호를 입력해주세요")
         @ApiParam(value = "회원 비밀번호")
         private String password;
 
@@ -94,7 +96,7 @@ public class UserDto {
         @ApiModelProperty(notes = "회원 닉네임")
         private String nickname;
 
-        @ApiModelProperty(notes = "회원 프로필 이미지")
+        @ApiModelProperty(notes = "회원 프로필 이미지 URL")
         private String profileImageUrl;
 
         @ApiModelProperty(notes = "로그인 인증 토큰")
@@ -109,24 +111,34 @@ public class UserDto {
     @Builder
     public static class UserInfoResponse {
 
+        @ApiModelProperty(notes = "회원 프로필 이미지 URL")
         private String profileImageUrl;
 
+        @ApiModelProperty(notes = "회원 이메일 주소")
         private String email;
 
+        @ApiModelProperty(notes = "회원 이름")
         private String name;
 
+        @ApiModelProperty(notes = "회원 닉네임")
         private String nickname;
 
+        @ApiModelProperty(notes = "회원 휴대폰 번호")
         private String phone;
 
+        @ApiModelProperty(notes = "회원정보 공개 여부")
         private boolean isActivated;
 
+        @ApiModelProperty(notes = "회원 선호 진행방식")
         private String preferredMethod;
 
+        @ApiModelProperty(notes = "회원 선호 지역")
         private String region;
 
+        @ApiModelProperty(notes = "회원 자기소개")
         private String information;
 
+        @ApiModelProperty(notes = "회원 기술스택")
         private List<String> skills;
 
     }
@@ -135,31 +147,39 @@ public class UserDto {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UpdateRequest {
 
+        @ApiParam(value = "회원 비밀번호")
         @NotBlank(message = "비밀번호를 입력해주세요")
         @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
         @Pattern(regexp = PASSWORD, message = "숫자, 문자, 특수문자 3가지를 조합해 입력해주세요")
         private String password;
 
+        @ApiParam(value = "회원 닉네임")
         @NotBlank(message = "닉네임을 입력해주세요")
         @Size(min = 2, max = 12, message = "닉네임은 3자 이상 12자 이하로 입력해주세요")
         private String nickname;
 
+        @ApiParam(value = "회원 휴대폰 번호")
         @NotBlank(message = "휴대폰 번호를 입력해주세요")
         @Pattern(regexp = PHONE, message = "올바른 휴대폰번호를 입력해주세요")
         private String phone;
 
+        @ApiParam(value = "회원정보 공개여부")
         @NotBlank
         private boolean isActivated;
 
+        @ApiParam(value = "회원 선호 진행방식")
         @NotBlank
         private String preferredMethod;
 
+        @ApiParam(value = "회원 선호 지역")
         @NotBlank
         private String region;
 
+        @ApiParam(value = "회원 자기소개")
         @NotBlank
         private String information;
 
+        @ApiParam(value = "회원 기술스택")
         @NotBlank
         private List<String> skills;
 
@@ -186,6 +206,7 @@ public class UserDto {
 
     @Getter
     public static class DeleteRequest {
+        @ApiParam(value = "회원 비밀번호")
         @NotBlank(message = "비밀번호를 입력해주세요")
         private String password;
 
@@ -197,6 +218,7 @@ public class UserDto {
     @Getter
     public static class EmailCertificationRequest {
 
+        @ApiParam(value = "회원 메일 주소")
         @NotBlank(message = "이메일 주소를 입력해주세요")
         private String email;
     }

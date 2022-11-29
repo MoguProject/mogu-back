@@ -37,13 +37,14 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation(value = "로그인")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest requestDto) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest requestDto) {
         LoginResponse loginResponse = userService.login(requestDto);
 
         return ResponseEntity.ok(loginResponse);
     }
 
     @GetMapping("/mypage")
+    @ApiOperation(value = "마이페이지 회원정보 출력")
     public ResponseEntity<UserInfoResponse> getMyPageInformation(
             @AuthenticationPrincipal Long userId) {
         UserInfoResponse userInfoResponse = userService.getMyPageInformation(userId);
@@ -52,6 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
+    @ApiOperation(value = "회원정보 수정")
     public ResponseEntity<Void> update(@Valid @RequestPart UpdateRequest requestDto,
                                        @RequestPart MultipartFile profileImage,
                                        @AuthenticationPrincipal Long userId) {
@@ -61,6 +63,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
+    @ApiOperation(value = "회원탈퇴")
     public ResponseEntity<Void> delete(@Valid @RequestBody DeleteRequest requestDto,
                                        @AuthenticationPrincipal Long userId) {
         userService.delete(requestDto, userId);
@@ -69,6 +72,7 @@ public class UserController {
     }
 
     @PostMapping("/email/certificate")
+    @ApiOperation(value = "인증메일 발송")
     public ResponseEntity<String> certificateEmail(
             @Valid @RequestBody EmailCertificationRequest requestDto) {
         String certificationCode = userService.certificateByEmail(requestDto);
