@@ -29,9 +29,10 @@ public class PostService {
     private final ImagePostRepository imagePostRepository;
     private final ImageService imageService;
 
-    public List<PostDto.Response> getPostList() {
+    public List<PostDto.Response> getPostList(Long categoryId) {
         List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc().stream()
-                .filter(post -> !post.isDeleted()).collect(Collectors.toList());
+                .filter(post -> !post.isDeleted())
+                .filter(post -> post.getCategory().getId().equals(categoryId)).collect(Collectors.toList());
 
         List<PostDto.Response> responseList = new ArrayList<>();
 
@@ -44,9 +45,14 @@ public class PostService {
         return responseList;
     }
 
-    public PostDto.Response getPostDetails(Long postId) {
+    public PostDto.Response getPostDetails(Long postId, Long currentUserId) {
 
         Post post = getPost(postId);
+
+        if (!post.getUser().getId().equals(currentUserId)) {
+            post.addViewCount(post.getView());
+            postRepository.save(post);
+        }
 
         List<Image> images = getImages(postId);
 
@@ -56,7 +62,7 @@ public class PostService {
 
     }
 
-    private List<Image> getImages(Long postId) {
+    public List<Image> getImages(Long postId) {
         List<ImagePost> imagePosts = imagePostRepository.findAllByPostId(postId);
 
         List<Image> images = new ArrayList<>();

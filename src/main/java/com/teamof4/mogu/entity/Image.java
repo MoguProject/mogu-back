@@ -1,5 +1,6 @@
 package com.teamof4.mogu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class Image {
 
     private String imageUrl;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "image")
     private List<User> users = new ArrayList<>();
 

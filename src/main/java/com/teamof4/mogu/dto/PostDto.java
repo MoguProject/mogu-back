@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class PostDto {
         private Long userId;
 
         @ApiParam(value = "카테고리 ID", required = true)
-        @NotBlank(message = "카테고리를 선택해 주세요.")
+        @NotNull(message = "카테고리를 선택해 주세요.")
         private Long categoryId;
 
         @ApiParam(value = "게시글 제목", required = true)
@@ -80,7 +81,7 @@ public class PostDto {
         @ApiModelProperty(notes = "카테고리 이름")
         private String categoryName;
 
-        @ApiModelProperty(notes = "게시글 내용")
+        @ApiModelProperty(notes = "게시글 제목")
         private String title;
 
         @ApiModelProperty(notes = "게시글 내용")
