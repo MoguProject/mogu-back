@@ -9,6 +9,19 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+#이메일 인증
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: junesuck99
+    password: ENC(bbugOkRLdSQYee7msGwYwVNdBhDMyTNhM5IAhbznlss=)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   #JPA
   jpa:
     hibernate:
@@ -23,12 +36,10 @@ spring:
         use_sql_comments: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     database: mysql
-
-#yml추가
+  
+  #yml추가
   config:
     import: jasypt.yml
-
-
 
 #LOG
 logging:

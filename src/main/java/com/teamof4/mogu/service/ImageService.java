@@ -1,17 +1,17 @@
 package com.teamof4.mogu.service;
 
-import com.teamof4.mogu.dto.ImageDto.SaveRequest;
+import com.teamof4.mogu.dto.ImageDto;
 import com.teamof4.mogu.entity.Image;
 import com.teamof4.mogu.exception.image.FailedImageUploadException;
 import com.teamof4.mogu.repository.ImageRepository;
 import com.teamof4.mogu.util.aws.AwsS3Service;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-@Slf4j
+import static com.teamof4.mogu.constants.DefaultImageConstants.DEFAULT_PROFILE_IMAGE_ID;
+
 @Service
 @RequiredArgsConstructor
 public class ImageService {
@@ -23,18 +23,32 @@ public class ImageService {
 
     @Transactional
     public Image saveProfileImage(MultipartFile profileImage) {
-        if(profileImage.isEmpty()) {
-            return imageRepository.findById(1L)
+        if (profileImage.isEmpty()) {
+            return imageRepository.findById(DEFAULT_PROFILE_IMAGE_ID)
                     .orElseThrow(() -> new FailedImageUploadException("기본 이미지를 찾지 못했습니다."));
         }
         String imageUrl = awsS3Service.uploadImage(profileImage);
-        SaveRequest saveRequest = new SaveRequest(imageUrl);
-        Image image = saveRequest.toEntity();
+        Image image = ImageDto.of(imageUrl);
 
         return imageRepository.save(image);
     }
 
     @Transactional
+    public Image updateProfileImage(MultipartFile profileImage) {
+        String imageUrl = awsS3Service.uploadImage(profileImage);
+        Image image = ImageDto.of(imageUrl);
+
+        return image;
+    }
+
+    //프로필 이미지가 기본 이미지가 아닐경우에만 이미지 테이블 삭제
+    @Transactional
+    public void deleteProfileImage(Image image) {
+        if(image.getId()!=DEFAULT_PROFILE_IMAGE_ID) {
+            deleteImage(image);
+        }
+    }
+
     public Image savePostImage(MultipartFile profileImage) {
 
         String imageUrl = awsS3Service.uploadImage(profileImage);
@@ -44,6 +58,7 @@ public class ImageService {
 
         return imageRepository.save(image);
     }
+
 
     @Transactional
     public void deleteImage(Image targetTmage) {
