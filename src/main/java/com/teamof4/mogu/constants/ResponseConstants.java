@@ -35,4 +35,10 @@ public class ResponseConstants {
 
     public static final ResponseEntity<String> FAILED_IMAGE_UPLOAD =
             new ResponseEntity<>("이미지 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    public static final ResponseEntity<String> ALREADY_MY_NICKNAME =
+            new ResponseEntity<>("이미 내가 사용중인 닉네임입니다.", HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> ALREADY_MY_PASSWORD =
+            new ResponseEntity<>("이미 내가 사용중인 비밀번호입니다.", HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> ALREADY_MY_PHONE =
+            new ResponseEntity<>("이미 내가 사용중인 휴대폰 번호입니다.", HttpStatus.CONFLICT);
 }

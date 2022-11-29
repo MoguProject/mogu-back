@@ -56,9 +56,9 @@ public class AwsS3Service {
 
     public static void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
-            log.info("파일이 삭제되었습니다.");
+            log.info("로컬파일이 삭제되었습니다.");
         } else {
-            log.info("파일이 삭제되지 못했습니다.");
+            log.info("로컬파일이 삭제되지 못했습니다.");
         }
     }
 

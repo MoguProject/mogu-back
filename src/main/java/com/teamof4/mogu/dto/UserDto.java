@@ -56,7 +56,6 @@ public class UserDto {
         }
 
         public User toEntity() {
-
             return User.builder()
                     .email(this.email)
                     .name(this.name)
@@ -163,6 +162,26 @@ public class UserDto {
 
         @NotBlank
         private List<String> skills;
+
+        public User toEntity() {
+            return User.builder()
+                    .nickname(this.getNickname())
+                    .password(this.getPassword())
+                    .phone(this.getPhone())
+                    .preferredMethod(this.getPreferredMethod())
+                    .region(this.getRegion())
+                    .information(this.getInformation())
+                    .isActivated(this.isActivated)
+                    .build();
+        }
+
+        public boolean checkPassword(EncryptionService encryptionService, String encryptedPassword) {
+            return encryptionService.isSamePassword(this.password, encryptedPassword);
+        }
+
+        public void encryptPassword(EncryptionService encryptionService) {
+            this.password = encryptionService.encrypt(password);
+        }
     }
 
     @Getter
@@ -173,5 +192,12 @@ public class UserDto {
         public boolean checkPassword(EncryptionService encryptionService, String encryptedPassword) {
             return encryptionService.isSamePassword(this.password, encryptedPassword);
         }
+    }
+
+    @Getter
+    public static class EmailCertificationRequest {
+
+        @NotBlank(message = "이메일 주소를 입력해주세요")
+        private String email;
     }
 }

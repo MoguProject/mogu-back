@@ -53,6 +53,27 @@ public class MoguExceptionHandler {
         return WRONG_PASSWORD;
     }
 
+    @ExceptionHandler(AlreadyMyNicknameException.class)
+    public final ResponseEntity<String> handleAlreadyMyNicknameException(
+            AlreadyMyNicknameException exception) {
+        log.debug("이미 내가 사용중인 닉네임입니다.");
+        return ALREADY_MY_NICKNAME;
+    }
+
+    @ExceptionHandler(AlreadyMyPasswordException.class)
+    public final ResponseEntity<String> handleAlreadyMyPasswordException(
+            AlreadyMyPasswordException exception) {
+        log.debug("이미 내가 사용중인 비밀번호입니다.");
+        return ALREADY_MY_PASSWORD;
+    }
+
+    @ExceptionHandler(AlreadyMyPhoneException.class)
+    public final ResponseEntity<String> handleAlreadyMyPhoneException(
+            AlreadyMyPhoneException exception) {
+        log.debug("이미 내가 사용중인 휴대폰 번호입니다.");
+        return ALREADY_MY_PHONE;
+    }
+
     @ExceptionHandler(FailedImageConvertException.class)
     public final ResponseEntity<String> handleFailedToConvertImageException(
             FailedImageConvertException exception) {

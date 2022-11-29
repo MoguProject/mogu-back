@@ -40,6 +40,15 @@ public class ImageService {
 
         return image;
     }
+
+    //프로필 이미지가 기본 이미지가 아닐경우에만 이미지 테이블 삭제
+    @Transactional
+    public void deleteProfileImage(Image image) {
+        if(image.getId()!=DEFAULT_PROFILE_IMAGE_ID) {
+            deleteImage(image);
+        }
+    }
+
     public Image savePostImage(MultipartFile profileImage) {
 
         String imageUrl = awsS3Service.uploadImage(profileImage);

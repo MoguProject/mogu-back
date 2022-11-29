@@ -61,12 +61,18 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> delete(@RequestBody DeleteRequest requestDto,
+    public ResponseEntity<Void> delete(@Valid @RequestBody DeleteRequest requestDto,
                                        @AuthenticationPrincipal Long userId) {
         userService.delete(requestDto, userId);
 
         return OK;
     }
 
+    @PostMapping("/email/certificate")
+    public ResponseEntity<String> certificateEmail(
+            @Valid @RequestBody EmailCertificationRequest requestDto) {
+        String certificationCode = userService.certificateByEmail(requestDto);
 
+        return ResponseEntity.ok(certificationCode);
+    }
 }

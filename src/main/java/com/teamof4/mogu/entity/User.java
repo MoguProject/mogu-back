@@ -1,6 +1,8 @@
 package com.teamof4.mogu.entity;
 
+import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
+import com.teamof4.mogu.dto.UserDto.UpdateRequest;
 import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
 import lombok.*;
 
@@ -90,6 +92,18 @@ public class User extends BaseTimeEntity {
                 .map(UserSkill::getSkill)
                 .map(Skill::getSkillName)
                 .collect(Collectors.toList());
+    }
+
+    public void updateUser(UpdateRequest updateRequest) {
+        this.nickname=updateRequest.getNickname();
+        this.phone=updateRequest.getPhone();
+        this.information=updateRequest.getInformation();
+        this.isActivated=updateRequest.isActivated();
+        this.password=updateRequest.getPassword();
+        this.preferredMethod=updateRequest.getPreferredMethod();
+        this.region=updateRequest.getRegion();
+
+
     }
 
     public void deleteUser() {
