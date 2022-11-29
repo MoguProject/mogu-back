@@ -1,5 +1,6 @@
 package com.teamof4.mogu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,11 +19,13 @@ public class Post extends BaseTimeEntity {
     private Long id;
 
     @Valid
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Valid
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -36,13 +39,9 @@ public class Post extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
+    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
+    private ProjectStudy projectStudy;
 
     public void updatePost(String title, String content) {
         this.title = title;
@@ -51,6 +50,10 @@ public class Post extends BaseTimeEntity {
 
     public void changeStatus() {
         this.isDeleted = true;
+    }
+
+    public void addViewCount(int view) {
+        this.view = view + 1;
     }
 
 }
