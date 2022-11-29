@@ -6,6 +6,9 @@ import io.swagger.annotations.ApiParam;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,24 +18,31 @@ public class ProjectStudyDto {
     @Getter
     public static class Request {
 
+        @NotBlank(message = "진행 방식을 선택해 주세요.")
         @ApiParam(value = "진행 방식", required = true)
         private String preferredMethod;
 
+        @NotBlank(message = "지역을 선택해 주세요.")
         @ApiParam(value = "지역", required = true)
         private String region;
 
+        @NotBlank(message = "진행 기간을 선택해 주세요.")
         @ApiParam(value = "진행 기간", required = true)
         private String period;
 
+        @NotNull(message = "모집 인원을 선택해 주세요.")
         @ApiParam(value = "모집 인원", required = true)
         private int memberCount;
 
+        @NotEmpty(message = "기술 스택을 선택해 주세요.")
         @ApiParam(value = "기술 스택", required = true)
         private List<Skill> skills;
 
+        @NotNull(message = "시작 예정일을 선택해 주세요.")
         @ApiParam(value = "시작 예정일", required = true)
         private LocalDate startAt;
 
+        @NotNull
         @ApiParam(value = "모집 여부")
         private boolean openStatus;
 
