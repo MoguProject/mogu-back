@@ -6,12 +6,14 @@ import com.teamof4.mogu.service.ProjectStudyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,20 +23,39 @@ public class ProjectStudyController {
 
     private final ProjectStudyService projectStudyService;
 
+
+    @GetMapping("/search/all/{categoryId}")
+    @ApiOperation(value = "프로젝트 스터디 제목/내용으로 검색", notes = "모집 여부와 상관없이 검색하여 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    public ResponseEntity<Page<ProjectStudyDto.Response>> searchAllList(@PathVariable Long categoryId,
+                                                                        @RequestParam String keyword,
+                                                                        @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectStudyService.getAllSearchedList(categoryId, keyword, pageable));
+    }
+
+    @GetMapping("/search/opened/{categoryId}")
+    @ApiOperation(value = "프로젝트 스터디 제목/내용으로 검색(모집 중)", notes = "모집 중인 게시글들만 검색하여 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    public ResponseEntity<Page<ProjectStudyDto.Response>> searchOpenedList(@PathVariable Long categoryId,
+                                                                        @RequestParam String keyword,
+                                                                        @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectStudyService.getOpenedSearchedList(categoryId, keyword, pageable));
+    }
+
     /**
      * 4(SIDE_PROJECT), 5(STUDY)
      * 위의 카테고리 아이디로 조회할 때만 사용한다.
      */
     @GetMapping("/list/all/{categoryId}")
     @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회", notes = "모집 여부와 상관없이 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
-    public ResponseEntity<List<ProjectStudyDto.Response>> getAllPostList(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(projectStudyService.getAllProjectStudyList(categoryId));
+    public ResponseEntity<Page<ProjectStudyDto.Response>> getAllPostList(@PathVariable Long categoryId,
+                                                                         @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectStudyService.getAllProjectStudyList(categoryId, pageable));
     }
 
     @GetMapping("/list/opened/{categoryId}")
     @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(모집 중)", notes = "모집 중인 게시글들만 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
-    public ResponseEntity<List<ProjectStudyDto.Response>> getOpenedPostList(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(projectStudyService.getOpenedProjectStudyList(categoryId));
+    public ResponseEntity<Page<ProjectStudyDto.Response>> getOpenedPostList(@PathVariable Long categoryId,
+                                                                            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectStudyService.getOpenedProjectStudyList(categoryId, pageable));
     }
 
     @GetMapping("/post/{postId}")
@@ -58,5 +79,4 @@ public class ProjectStudyController {
                                            @Valid @RequestBody ProjectStudyDto.Request projectStudyDto) {
         return ResponseEntity.ok(projectStudyService.updateProjectStudy(postId, postDto, projectStudyDto));
     }
-
 }

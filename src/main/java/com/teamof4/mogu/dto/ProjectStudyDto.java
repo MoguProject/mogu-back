@@ -101,10 +101,6 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "모집 완료 여부")
         private boolean openStatus;
 
-        // filter 조건으로 사용하기 위해 필요
-        @ApiModelProperty(notes = "게시글 삭제 여부")
-        private boolean deleteStatus;
-
         @ApiModelProperty(notes = "기술 스택 리스트")
         private List<PostSkill> postSkills;
 
@@ -115,10 +111,10 @@ public class ProjectStudyDto {
         private LocalDate startAt;
 
         @ApiModelProperty(notes = "게시글 생성일")
-        private LocalDateTime createAt;
+        private LocalDateTime createdAt;
 
         @ApiModelProperty(notes = "게시글 생성일")
-        private LocalDateTime updateAt;
+        private LocalDateTime updatedAt;
 
         @Builder
         public Response(Post post, ProjectStudy projectStudy, List<Image> images) {
@@ -135,13 +131,12 @@ public class ProjectStudyDto {
             this.region = projectStudy.getRegion();
             this.period = projectStudy.getPeriod();
             this.memberCount = projectStudy.getMemberCount();
-            this.deleteStatus = post.isDeleted();
             this.openStatus = projectStudy.isOpenStatus();
             this.postSkills = projectStudy.getPostSkills();
             this.imageList = images;
             this.startAt = projectStudy.getStartAt();
-            this.createAt = post.getCreatedAt();
-            this.updateAt = post.getUpdatedAt();
+            this.createdAt = post.getCreatedAt();
+            this.updatedAt = post.getUpdatedAt();
 
         }
     }

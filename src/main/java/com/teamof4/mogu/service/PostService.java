@@ -9,6 +9,9 @@ import com.teamof4.mogu.exception.user.UserNotFoundException;
 import com.teamof4.mogu.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,10 +32,9 @@ public class PostService {
     private final ImagePostRepository imagePostRepository;
     private final ImageService imageService;
 
-    public List<PostDto.Response> getPostList(Long categoryId) {
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc().stream()
-                .filter(post -> !post.isDeleted())
-                .filter(post -> post.getCategory().getId().equals(categoryId)).collect(Collectors.toList());
+    public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable) {
+
+        Page<Post> posts = postRepository.findAll(pageable);
 
         List<PostDto.Response> responseList = new ArrayList<>();
 
@@ -42,7 +44,9 @@ public class PostService {
                     .images(getImages(post.getId())).build();
             responseList.add(response);
         }
-        return responseList;
+        return new PageImpl<>(responseList.stream()
+                .filter(dto -> dto.getCategoryId().equals(categoryId))
+                .collect(Collectors.toList()));
     }
 
     public PostDto.Response getPostDetails(Long postId, Long currentUserId) {

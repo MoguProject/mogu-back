@@ -9,6 +9,9 @@ import com.teamof4.mogu.repository.PostRepository;
 import com.teamof4.mogu.repository.PostSkillRepository;
 import com.teamof4.mogu.repository.ProjectStudyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,23 +30,42 @@ public class ProjectStudyService {
     private final PostSkillRepository postSkillRepository;
     private final PostService postService;
 
-    public List<ProjectStudyDto.Response> getAllProjectStudyList(Long categoryId) {
-        List<ProjectStudy> projectStudies = projectStudyRepository.findAll();
+    public Page<ProjectStudyDto.Response> getAllSearchedList(Long categoryId, String keyword, Pageable pageable) {
+        Page<ProjectStudy> projectStudies = projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, pageable);
 
-        return getResponses(projectStudies).stream()
-                .filter(dto -> !dto.isDeleteStatus() && dto.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList());
+        return getAllPageImpl(getResponses(projectStudies).stream(), categoryId);
     }
 
-    public List<ProjectStudyDto.Response> getOpenedProjectStudyList(Long categoryId) {
-        List<ProjectStudy> projectStudies = projectStudyRepository.findAll();
+    public Page<ProjectStudyDto.Response> getOpenedSearchedList(Long categoryId, String keyword, Pageable pageable) {
+        Page<ProjectStudy> projectStudies = projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, pageable);
 
-        return getResponses(projectStudies).stream()
-                .filter(dto -> !dto.isDeleteStatus() && dto.isOpenStatus())
+        return getOpenedPageImpl(getResponses(projectStudies), categoryId);
+    }
+
+    public Page<ProjectStudyDto.Response> getAllProjectStudyList(Long categoryId, Pageable pageable) {
+        Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(pageable);
+
+        return getAllPageImpl(getResponses(projectStudies).stream(), categoryId);
+    }
+
+    private PageImpl<ProjectStudyDto.Response> getAllPageImpl(Stream<ProjectStudyDto.Response> projectStudies, Long categoryId) {
+        return new PageImpl<>(projectStudies
                 .filter(dto -> dto.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
+    public Page<ProjectStudyDto.Response> getOpenedProjectStudyList(Long categoryId, Pageable pageable) {
+        Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(pageable);
+
+        return getOpenedPageImpl(getResponses(projectStudies), categoryId);
+    }
+
+    private PageImpl<ProjectStudyDto.Response> getOpenedPageImpl(Page<ProjectStudyDto.Response> projectStudies, Long categoryId) {
+        return new PageImpl<>(projectStudies.stream()
+                .filter(ProjectStudyDto.Response::isOpenStatus)
+                .filter(dto -> dto.getCategoryId().equals(categoryId))
+                .collect(Collectors.toList()));
+    }
 
     public ProjectStudyDto.Response getProjectStudyDetails(Long postId, Long currentUserId) {
         Post post = postService.getPost(postId);
@@ -103,7 +126,7 @@ public class ProjectStudyService {
         }
     }
 
-    private List<ProjectStudyDto.Response> getResponses(List<ProjectStudy> projectStudies) {
+    private Page<ProjectStudyDto.Response> getResponses(Page<ProjectStudy> projectStudies) {
         List<ProjectStudyDto.Response> responseList = new ArrayList<>();
 
         for (ProjectStudy post : projectStudies) {
@@ -116,8 +139,8 @@ public class ProjectStudyService {
 
             responseList.add(response);
         }
-        return responseList.stream()
-                .sorted(Comparator.comparing(ProjectStudyDto.Response::getCreateAt).reversed())
-                .collect(Collectors.toList());
+        return new PageImpl<>(responseList.stream()
+                .sorted(Comparator.comparing(ProjectStudyDto.Response::getCreatedAt).reversed())
+                .collect(Collectors.toList()));
     }
 }

@@ -2,6 +2,7 @@ package com.teamof4.mogu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Builder
 @AllArgsConstructor
+@Where(clause = "is_deleted = '0'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTimeEntity {
 
