@@ -5,12 +5,15 @@ import com.teamof4.mogu.service.PostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,8 +29,9 @@ public class PostController {
      */
     @GetMapping("/list/{categoryId}")
     @ApiOperation(value = "커뮤니티 게시글 전체 조회", notes = "카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
-    public ResponseEntity<List<PostDto.Response>> getPostList(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(postService.getPostList(categoryId));
+    public ResponseEntity<Page<PostDto.Response>> getPostList(@PathVariable Long categoryId,
+                                                              @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostList(categoryId, pageable));
     }
 
     @GetMapping("/post/{id}")

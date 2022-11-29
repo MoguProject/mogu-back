@@ -94,10 +94,10 @@ public class PostDto {
         private List<Image> imageList;
 
         @ApiModelProperty(notes = "게시글 생성일")
-        private LocalDateTime createAt;
+        private LocalDateTime createdAt;
 
         @ApiModelProperty(notes = "게시글 수정일")
-        private LocalDateTime updateAt;
+        private LocalDateTime updatedAt;
 
         @Builder
         public Response(Post post, List<Image> images) {
@@ -110,8 +110,8 @@ public class PostDto {
             this.content = post.getContent();
             this.view = post.getView();
             this.imageList = images;
-            this.createAt = post.getCreatedAt();
-            this.updateAt = post.getUpdatedAt();
+            this.createdAt = post.getCreatedAt();
+            this.updatedAt = post.getUpdatedAt();
         }
     }
 }
