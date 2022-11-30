@@ -1,5 +1,6 @@
 package com.teamof4.mogu.repository;
 
+import com.teamof4.mogu.entity.Category;
 import com.teamof4.mogu.entity.Post;
 import com.teamof4.mogu.entity.ProjectStudy;
 import org.springframework.data.domain.Page;
@@ -15,9 +16,18 @@ import java.util.Optional;
 public interface ProjectStudyRepository extends JpaRepository<ProjectStudy, Long> {
     Optional<ProjectStudy> findByPost(Post post);
 
-    Page<ProjectStudy> findAll(Pageable pageable);
+    @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
+            "WHERE p.category = :category " +
+            "ORDER BY p.createdAt DESC")
+    Page<ProjectStudy> findAll(Category category, Pageable pageable);
 
-    @Query("SELECT ps FROM ProjectStudy ps\n" +
-            "join ps.post p WHERE p.title LIKE %:keyword% OR p.content LIKE %:keyword%")
-    Page<ProjectStudy> findAllByTitleAndContentContainingIgnoreCase(String keyword, Pageable pageable);
+    @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
+            "WHERE p.category = :category " +
+            "ORDER BY size(p.likes) DESC, p.createdAt DESC")
+    Page<ProjectStudy> findAllLikesDesc(Category category, Pageable pageable);
+
+    @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
+            "WHERE p.category = :category " +
+            "AND p.title LIKE %:keyword% OR p.content LIKE %:keyword%")
+    Page<ProjectStudy> findAllByTitleAndContentContainingIgnoreCase(String keyword, Category category, Pageable pageable);
 }

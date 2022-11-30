@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static com.teamof4.mogu.constants.SortStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/projectstudy")
@@ -25,19 +27,19 @@ public class ProjectStudyController {
 
 
     @GetMapping("/search/all/{categoryId}")
-    @ApiOperation(value = "프로젝트 스터디 제목/내용으로 검색", notes = "모집 여부와 상관없이 검색하여 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "프로젝트 스터디 제목/내용으로 검색", notes = "모집 여부와 상관없이 검색하여 카테고리 별 / 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<ProjectStudyDto.Response>> searchAllList(@PathVariable Long categoryId,
                                                                         @RequestParam String keyword,
                                                                         @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(projectStudyService.getAllSearchedList(categoryId, keyword, pageable));
+        return ResponseEntity.ok(projectStudyService.getSearchedList(categoryId, keyword, pageable, ALL));
     }
 
     @GetMapping("/search/opened/{categoryId}")
-    @ApiOperation(value = "프로젝트 스터디 제목/내용으로 검색(모집 중)", notes = "모집 중인 게시글들만 검색하여 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "프로젝트 스터디 제목/내용으로 검색(모집 중)", notes = "모집 중인 게시글들만 검색하여 카테고리 별 / 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<ProjectStudyDto.Response>> searchOpenedList(@PathVariable Long categoryId,
-                                                                        @RequestParam String keyword,
+                                                                           @RequestParam String keyword,
                                                                         @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(projectStudyService.getOpenedSearchedList(categoryId, keyword, pageable));
+        return ResponseEntity.ok(projectStudyService.getSearchedList(categoryId, keyword, pageable, OPENED));
     }
 
     /**
@@ -45,17 +47,24 @@ public class ProjectStudyController {
      * 위의 카테고리 아이디로 조회할 때만 사용한다.
      */
     @GetMapping("/list/all/{categoryId}")
-    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회", notes = "모집 여부와 상관없이 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회", notes = "모집 여부와 상관없이 카테고리 별 / 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<ProjectStudyDto.Response>> getAllPostList(@PathVariable Long categoryId,
                                                                          @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(projectStudyService.getAllProjectStudyList(categoryId, pageable));
+        return ResponseEntity.ok(projectStudyService.getProjectStudyList(categoryId, pageable, ALL));
     }
 
     @GetMapping("/list/opened/{categoryId}")
-    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(모집 중)", notes = "모집 중인 게시글들만 카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(모집 중)", notes = "모집 중인 게시글들만 카테고리 별 / 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<ProjectStudyDto.Response>> getOpenedPostList(@PathVariable Long categoryId,
                                                                             @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(projectStudyService.getOpenedProjectStudyList(categoryId, pageable));
+        return ResponseEntity.ok(projectStudyService.getProjectStudyList(categoryId, pageable, OPENED));
+    }
+
+    @GetMapping("/list/likes/{categoryId}")
+    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(조회 순)", notes = "카테고리 별 / 조회 순 / 생성일 기준 내림차 순으로 출력한다.")
+    public ResponseEntity<Page<ProjectStudyDto.Response>> getLikesProjectStudyList(@PathVariable Long categoryId,
+                                                                         @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectStudyService.getProjectStudyList(categoryId, pageable, LIKES));
     }
 
     @GetMapping("/post/{postId}")
@@ -68,8 +77,9 @@ public class ProjectStudyController {
     @PostMapping("/create")
     @ApiOperation(value = "프로젝트/스터디 게시글 등록")
     public ResponseEntity<Long> saveProjectStudy(@Valid PostDto.SaveRequest postDto,
-                                                 @Valid @RequestBody ProjectStudyDto.Request projectStudyDto) {
-        return ResponseEntity.ok(projectStudyService.saveProjectStudy(postDto, projectStudyDto));
+                                                 @Valid @RequestBody ProjectStudyDto.Request projectStudyDto,
+                                                 @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(projectStudyService.saveProjectStudy(postDto, projectStudyDto, userId));
     }
 
     @PostMapping("/update/{postId}")

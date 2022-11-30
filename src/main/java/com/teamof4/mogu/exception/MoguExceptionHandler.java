@@ -88,6 +88,11 @@ public class MoguExceptionHandler {
         return FAILED_IMAGE_UPLOAD;
     }
 
+    @ExceptionHandler(UserNotLoginedException.class)
+    public final ResponseEntity<String> handleUserNotLoginedException() {
+        return NOT_LOGINED_USER;
+    }
+
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Map<String, String>> handleBindException(BindException exception) {
         Map<String, String> errors = new HashMap<>();

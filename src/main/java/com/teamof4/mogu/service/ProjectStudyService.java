@@ -1,6 +1,6 @@
 package com.teamof4.mogu.service;
 
-import com.amazonaws.util.CollectionUtils;
+import com.teamof4.mogu.constants.SortStatus;
 import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.dto.ProjectStudyDto;
 import com.teamof4.mogu.entity.*;
@@ -16,10 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static com.teamof4.mogu.constants.SortStatus.ALL;
+import static com.teamof4.mogu.constants.SortStatus.OPENED;
 
 @Service
 @RequiredArgsConstructor
@@ -30,41 +32,46 @@ public class ProjectStudyService {
     private final PostSkillRepository postSkillRepository;
     private final PostService postService;
 
-    public Page<ProjectStudyDto.Response> getAllSearchedList(Long categoryId, String keyword, Pageable pageable) {
-        Page<ProjectStudy> projectStudies = projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, pageable);
+    public Page<ProjectStudyDto.Response> getSearchedList(Long categoryId, String keyword,
+                                                             Pageable pageable, SortStatus status) {
+        Category category = postService.getCategory(categoryId);
 
-        return getAllPageImpl(getResponses(projectStudies).stream(), categoryId);
+        Page<ProjectStudy> projectStudies =
+                projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, category, pageable);
+
+        Page<ProjectStudyDto.Response> projectStudyDtoList = new PageImpl<>(Collections.emptyList());
+        if (status.equals(ALL)) {
+            projectStudyDtoList = getResponses(projectStudies);
+        } else if (status.equals(OPENED)) {
+            projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies));
+        }
+
+        return projectStudyDtoList;
     }
 
-    public Page<ProjectStudyDto.Response> getOpenedSearchedList(Long categoryId, String keyword, Pageable pageable) {
-        Page<ProjectStudy> projectStudies = projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, pageable);
+    public Page<ProjectStudyDto.Response> getProjectStudyList(Long categoryId, Pageable pageable, SortStatus status) {
 
-        return getOpenedPageImpl(getResponses(projectStudies), categoryId);
-    }
+        Category category = postService.getCategory(categoryId);
+        Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(category, pageable);
 
-    public Page<ProjectStudyDto.Response> getAllProjectStudyList(Long categoryId, Pageable pageable) {
-        Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(pageable);
+        Page<ProjectStudyDto.Response> projectStudyDtoList = new PageImpl<>(Collections.emptyList());
 
-        return getAllPageImpl(getResponses(projectStudies).stream(), categoryId);
-    }
+        switch (status) {
+            case ALL:
+                projectStudyDtoList = getResponses(projectStudies);
+                break;
+            case OPENED:
+                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies));
+                break;
+            case LIKES:
+                projectStudies = projectStudyRepository.findAllLikesDesc(category, pageable);
+                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies));
+                break;
+            case DEFAULT:
+                break;
+        }
 
-    private PageImpl<ProjectStudyDto.Response> getAllPageImpl(Stream<ProjectStudyDto.Response> projectStudies, Long categoryId) {
-        return new PageImpl<>(projectStudies
-                .filter(dto -> dto.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList()));
-    }
-
-    public Page<ProjectStudyDto.Response> getOpenedProjectStudyList(Long categoryId, Pageable pageable) {
-        Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(pageable);
-
-        return getOpenedPageImpl(getResponses(projectStudies), categoryId);
-    }
-
-    private PageImpl<ProjectStudyDto.Response> getOpenedPageImpl(Page<ProjectStudyDto.Response> projectStudies, Long categoryId) {
-        return new PageImpl<>(projectStudies.stream()
-                .filter(ProjectStudyDto.Response::isOpenStatus)
-                .filter(dto -> dto.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList()));
+        return projectStudyDtoList;
     }
 
     public ProjectStudyDto.Response getProjectStudyDetails(Long postId, Long currentUserId) {
@@ -85,9 +92,10 @@ public class ProjectStudyService {
     }
 
     @Transactional
-    public Long saveProjectStudy(PostDto.SaveRequest postDTO, ProjectStudyDto.Request projectStudyDTO) {
+    public Long saveProjectStudy(PostDto.SaveRequest postDTO,
+                                 ProjectStudyDto.Request projectStudyDTO, Long currentUserId) {
 
-        Long postId = postService.savePost(postDTO);
+        Long postId = postService.savePost(postDTO, currentUserId);
         Post post = postService.getPost(postId);
 
         ProjectStudy projectStudy = projectStudyDTO.toEntity(post);
@@ -139,8 +147,12 @@ public class ProjectStudyService {
 
             responseList.add(response);
         }
-        return new PageImpl<>(responseList.stream()
-                .sorted(Comparator.comparing(ProjectStudyDto.Response::getCreatedAt).reversed())
+        return new PageImpl<>(responseList);
+    }
+
+    private PageImpl<ProjectStudyDto.Response> getOpenedPageImpl(Page<ProjectStudyDto.Response> projectStudies) {
+        return new PageImpl<>(projectStudies.stream()
+                .filter(ProjectStudyDto.Response::isOpenStatus)
                 .collect(Collectors.toList()));
     }
 }
