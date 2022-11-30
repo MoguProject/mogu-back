@@ -42,9 +42,6 @@ public class Post extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
-    private ProjectStudy projectStudy;
-
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Like> likes;
 

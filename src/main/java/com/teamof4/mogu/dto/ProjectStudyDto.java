@@ -98,6 +98,9 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "조회수")
         private int view;
 
+        @ApiModelProperty(notes = "로그인 한 유저의 좋아요 여부")
+        private boolean likeStatus;
+
         @ApiModelProperty(notes = "좋아요 수")
         private int likeCount;
 
@@ -120,7 +123,7 @@ public class ProjectStudyDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, ProjectStudy projectStudy, List<Image> images) {
+        public Response(Post post, ProjectStudy projectStudy, List<Image> images, boolean isLiked) {
 
             this.postId = post.getId();
             this.userId = post.getUser().getId();
@@ -131,6 +134,7 @@ public class ProjectStudyDto {
             this.content = post.getContent();
             this.view = post.getView();
             this.likeCount = post.getLikes().size();
+            this.likeStatus = isLiked;
             this.preferredMethod = projectStudy.getPreferredMethod();
             this.region = projectStudy.getRegion();
             this.period = projectStudy.getPeriod();

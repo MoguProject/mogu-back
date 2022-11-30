@@ -39,19 +39,19 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final ImageService imageService;
 
-    public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable, SortStatus status) {
+    public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable,
+                                              Long currentUserId, SortStatus status) {
 
         Page<Post> posts = new PageImpl<>(Collections.emptyList());
+        Category category = getCategory(categoryId);
 
         if (status.equals(DEFAULT)) {
-            posts = postRepository.findAll(pageable);
+            posts = postRepository.findAll(pageable, category);
         } else if(status.equals(LIKES)) {
-            posts = postRepository.findAllLikesDesc(pageable);
+            posts = postRepository.findAllLikesDesc(pageable, category);
         }
 
-        return new PageImpl<>(getResponses(posts).stream()
-                .filter(dto -> dto.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList()));
+        return new PageImpl<>(getResponses(posts, currentUserId));
     }
 
     public PostDto.Response getPostDetails(Long postId, Long currentUserId) {
@@ -67,7 +67,8 @@ public class PostService {
 
         return PostDto.Response.builder()
                 .post(post)
-                .images(images).build();
+                .images(images)
+                .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
 
     }
 
@@ -129,7 +130,7 @@ public class PostService {
         Post post = getPost(postId);
 
         boolean likeStatus = false;
-        if (!likeExistence(user, post)) {
+        if (!isLiked(user, post)) {
             likeRepository.save(Like.builder()
                     .user(user)
                     .post(post).build());
@@ -145,8 +146,18 @@ public class PostService {
                 .count(likeRepository.countByPost(post)).build();
     }
 
-    private boolean likeExistence(User user, Post post) {
+    private boolean isLiked(User user, Post post) {
         return likeRepository.findByUserAndPost(user, post).isPresent();
+    }
+
+    public boolean isLikedByCurrentUser(Long currentUserId, Post post) {
+        boolean isLiked = false;
+
+        if (currentUserId != null && isLiked(getUser(currentUserId), post)) {
+            isLiked = true;
+        }
+
+        return isLiked;
     }
 
     private void updatePostImageProcess(Post post, List<MultipartFile> multipartFiles, List<ImagePost> imagePosts) {
@@ -173,13 +184,14 @@ public class PostService {
         }
     }
 
-    private List<PostDto.Response> getResponses(Page<Post> posts) {
+    private List<PostDto.Response> getResponses(Page<Post> posts, Long currentUserId) {
         List<PostDto.Response> responseList = new ArrayList<>();
 
         for (Post post : posts) {
             PostDto.Response response = PostDto.Response.builder()
                     .post(post)
-                    .images(getImages(post.getId())).build();
+                    .images(getImages(post.getId()))
+                    .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
             responseList.add(response);
         }
         return responseList;

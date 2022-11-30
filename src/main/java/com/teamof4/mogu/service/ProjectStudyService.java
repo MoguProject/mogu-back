@@ -32,7 +32,7 @@ public class ProjectStudyService {
     private final PostSkillRepository postSkillRepository;
     private final PostService postService;
 
-    public Page<ProjectStudyDto.Response> getSearchedList(Long categoryId, String keyword,
+    public Page<ProjectStudyDto.Response> getSearchedList(Long categoryId, String keyword, Long currentUserId,
                                                              Pageable pageable, SortStatus status) {
         Category category = postService.getCategory(categoryId);
 
@@ -41,15 +41,16 @@ public class ProjectStudyService {
 
         Page<ProjectStudyDto.Response> projectStudyDtoList = new PageImpl<>(Collections.emptyList());
         if (status.equals(ALL)) {
-            projectStudyDtoList = getResponses(projectStudies);
+            projectStudyDtoList = getResponses(projectStudies, currentUserId);
         } else if (status.equals(OPENED)) {
-            projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies));
+            projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies, currentUserId));
         }
 
         return projectStudyDtoList;
     }
 
-    public Page<ProjectStudyDto.Response> getProjectStudyList(Long categoryId, Pageable pageable, SortStatus status) {
+    public Page<ProjectStudyDto.Response> getProjectStudyList(Long categoryId, Pageable pageable,
+                                                              Long currentUserId, SortStatus status) {
 
         Category category = postService.getCategory(categoryId);
         Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(category, pageable);
@@ -58,14 +59,14 @@ public class ProjectStudyService {
 
         switch (status) {
             case ALL:
-                projectStudyDtoList = getResponses(projectStudies);
+                projectStudyDtoList = getResponses(projectStudies, currentUserId);
                 break;
             case OPENED:
-                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies));
+                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies, currentUserId));
                 break;
             case LIKES:
                 projectStudies = projectStudyRepository.findAllLikesDesc(category, pageable);
-                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies));
+                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies, currentUserId));
                 break;
             case DEFAULT:
                 break;
@@ -87,7 +88,8 @@ public class ProjectStudyService {
         return ProjectStudyDto.Response.builder()
                 .post(post)
                 .projectStudy(projectStudy)
-                .images(postService.getImages(postId)).build();
+                .images(postService.getImages(postId))
+                .isLiked(postService.isLikedByCurrentUser(currentUserId, post)).build();
 
     }
 
@@ -134,7 +136,7 @@ public class ProjectStudyService {
         }
     }
 
-    private Page<ProjectStudyDto.Response> getResponses(Page<ProjectStudy> projectStudies) {
+    private Page<ProjectStudyDto.Response> getResponses(Page<ProjectStudy> projectStudies, Long currentUserId) {
         List<ProjectStudyDto.Response> responseList = new ArrayList<>();
 
         for (ProjectStudy post : projectStudies) {
@@ -143,7 +145,8 @@ public class ProjectStudyService {
             ProjectStudyDto.Response response = ProjectStudyDto.Response.builder()
                     .post(post.getPost())
                     .projectStudy(post)
-                    .images(images).build();
+                    .images(images)
+                    .isLiked(postService.isLikedByCurrentUser(currentUserId, post.getPost())).build();
 
             responseList.add(response);
         }

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static com.teamof4.mogu.constants.SortStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -33,15 +35,17 @@ public class PostController {
     @GetMapping("/list/{categoryId}")
     @ApiOperation(value = "커뮤니티 게시글 전체 조회(생성일 기준)", notes = "카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<PostDto.Response>> getPostList(@PathVariable Long categoryId,
+                                                              @AuthenticationPrincipal Long userId,
              @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(postService.getPostList(categoryId, pageable, SortStatus.DEFAULT));
+        return ResponseEntity.ok(postService.getPostList(categoryId, pageable, userId, DEFAULT));
     }
 
     @GetMapping("/list/likes/{categoryId}")
     @ApiOperation(value = "커뮤니티 게시글 전체 조회(좋아요 수 기준)", notes = "카테고리 별, 좋아요 순 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<PostDto.Response>> getLikesPostList(@PathVariable Long categoryId,
-                                                                       @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(postService.getPostList(categoryId, pageable, SortStatus.LIKES));
+                                                                   @AuthenticationPrincipal Long userId,
+                                                                   @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostList(categoryId, pageable, userId, LIKES));
     }
 
     @GetMapping("/post/{id}")
