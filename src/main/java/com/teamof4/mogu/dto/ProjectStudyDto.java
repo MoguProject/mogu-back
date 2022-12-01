@@ -65,7 +65,7 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "게시글 ID")
         private Long postId;
 
-        @ApiModelProperty(notes = "작성목 ID")
+        @ApiModelProperty(notes = "작성자 ID")
         private Long userId;
 
         @ApiModelProperty(notes = "게시글 ID")
@@ -98,6 +98,12 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "조회수")
         private int view;
 
+        @ApiModelProperty(notes = "로그인 한 유저의 좋아요 여부")
+        private boolean likeStatus;
+
+        @ApiModelProperty(notes = "좋아요 수")
+        private int likeCount;
+
         @ApiModelProperty(notes = "모집 완료 여부")
         private boolean openStatus;
 
@@ -117,7 +123,7 @@ public class ProjectStudyDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, ProjectStudy projectStudy, List<Image> images) {
+        public Response(Post post, ProjectStudy projectStudy, List<Image> images, boolean isLiked) {
 
             this.postId = post.getId();
             this.userId = post.getUser().getId();
@@ -127,6 +133,8 @@ public class ProjectStudyDto {
             this.title = post.getTitle();
             this.content = post.getContent();
             this.view = post.getView();
+            this.likeCount = post.getLikes().size();
+            this.likeStatus = isLiked;
             this.preferredMethod = projectStudy.getPreferredMethod();
             this.region = projectStudy.getRegion();
             this.period = projectStudy.getPeriod();

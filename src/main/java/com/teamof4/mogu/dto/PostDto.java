@@ -18,9 +18,6 @@ public class PostDto {
     @Builder
     public static class SaveRequest {
 
-        @ApiParam(value = "작성자 ID", required = true)
-        private Long userId;
-
         @ApiParam(value = "카테고리 ID", required = true)
         @NotNull(message = "카테고리를 선택해 주세요.")
         private Long categoryId;
@@ -90,6 +87,12 @@ public class PostDto {
         @ApiModelProperty(notes = "조회수")
         private int view;
 
+        @ApiModelProperty(notes = "좋아요 수")
+        private int likeCount;
+
+        @ApiModelProperty(notes = "로그인 한 유저의 좋아요 여부")
+        private boolean likeStatus;
+
         @ApiModelProperty(notes = "게시글 이미지 리스트")
         private List<Image> imageList;
 
@@ -100,7 +103,7 @@ public class PostDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, List<Image> images) {
+        public Response(Post post, List<Image> images, boolean isLiked) {
             this.id = post.getId();
             this.userId = post.getUser().getId();
             this.categoryId = post.getCategory().getId();
@@ -109,6 +112,8 @@ public class PostDto {
             this.title = post.getTitle();
             this.content = post.getContent();
             this.view = post.getView();
+            this.likeCount = post.getLikes().size();
+            this.likeStatus = isLiked;
             this.imageList = images;
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();

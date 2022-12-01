@@ -7,6 +7,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,9 +42,8 @@ public class Post extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-
-    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
-    private ProjectStudy projectStudy;
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<Like> likes;
 
     public void updatePost(String title, String content) {
         this.title = title;
