@@ -1,8 +1,8 @@
 package com.teamof4.mogu.controller;
 
-import com.teamof4.mogu.constants.SortStatus;
 import com.teamof4.mogu.dto.LikeDto;
 import com.teamof4.mogu.dto.PostDto;
+import com.teamof4.mogu.dto.PostDto.SaveRequest;
 import com.teamof4.mogu.exception.user.UserNotLoginedException;
 import com.teamof4.mogu.service.PostService;
 import io.swagger.annotations.Api;
@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import static com.teamof4.mogu.constants.SortStatus.*;
+import static com.teamof4.mogu.dto.PostDto.*;
+import static com.teamof4.mogu.dto.ReplyDto.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,7 +59,8 @@ public class PostController {
 
     @PostMapping("/create")
     @ApiOperation(value = "커뮤니티 게시글 등록")
-    public ResponseEntity<Long> savePost(@Valid PostDto.SaveRequest dto, @AuthenticationPrincipal Long userId) {
+    public ResponseEntity<Long> savePost(@Valid SaveRequest dto,
+                                         @AuthenticationPrincipal Long userId) {
         if (userId == null) {
             throw new UserNotLoginedException();
         }
@@ -66,7 +69,7 @@ public class PostController {
 
     @PostMapping("/update/{postId}")
     @ApiOperation(value = "커뮤니티 게시글 수정")
-    public ResponseEntity<Long> updatePost(@PathVariable Long postId, @Valid PostDto.UpdateRequest dto) {
+    public ResponseEntity<Long> updatePost(@PathVariable Long postId, @Valid UpdateRequest dto) {
         return ResponseEntity.ok(postService.updatePost(postId, dto));
     }
 
@@ -86,5 +89,32 @@ public class PostController {
         }
 
         return ResponseEntity.ok(postService.likeProcess(postId, userId));
+    }
+
+    @PostMapping("/reply/create/super")
+    @ApiOperation(value = "최상위 댓글 등록")
+    public ResponseEntity<Long> saveSuperReply(@Valid @RequestBody SuperRequest dto,
+                                               @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(postService.saveSuperReply(userId, dto));
+    }
+
+    @PostMapping("/reply/create/sub")
+    @ApiOperation(value = "하위 댓글 등록")
+    public ResponseEntity<Long> saveSubReply(@Valid @RequestBody Request dto,
+                                               @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(postService.saveSubReply(userId, dto));
+    }
+
+    @PostMapping("/reply/update")
+    @ApiOperation(value = "댓글 수정")
+    public ResponseEntity<Long> updateReply(@Valid @RequestBody Request dto) {
+        return ResponseEntity.ok(postService.updateReply(dto));
+    }
+
+    @PostMapping("/reply/delete/{replyId}")
+    @ApiOperation(value = "댓글 삭제")
+    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId) {
+        postService.deleteReply(replyId);
+        return ResponseEntity.ok().build();
     }
 }
