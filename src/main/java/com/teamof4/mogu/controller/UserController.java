@@ -28,9 +28,8 @@ public class UserController {
 
     @PostMapping("/create")
     @ApiOperation(value = "회원 등록")
-    public ResponseEntity<Void> createUser(@Valid @RequestPart SaveRequest requestDto,
-                                           @RequestPart MultipartFile profileImage) {
-        userService.save(requestDto, profileImage);
+    public ResponseEntity<Void> createUser(@Valid @RequestPart SaveRequest requestDto) {
+        userService.save(requestDto);
 
         return CREATED;
     }
@@ -58,6 +57,15 @@ public class UserController {
                                        @RequestPart MultipartFile profileImage,
                                        @AuthenticationPrincipal Long userId) {
         userService.update(requestDto, profileImage, userId);
+
+        return OK;
+    }
+
+    @PutMapping("/update/password")
+    public ResponseEntity<Void> updatePassword(
+            @Valid @RequestBody UpdatePasswordRequest requestDto,
+            @AuthenticationPrincipal Long userId) {
+        userService.updatePassword(requestDto, userId);
 
         return OK;
     }

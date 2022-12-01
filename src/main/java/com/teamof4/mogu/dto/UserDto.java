@@ -69,10 +69,8 @@ public class UserDto {
                     .isDeleted(false)
                     .build();
         }
-
     }
 
-    @ToString
     @Getter
     public static class LoginRequest {
 
@@ -140,18 +138,12 @@ public class UserDto {
 
         @ApiModelProperty(notes = "회원 기술스택")
         private List<String> skills;
-
     }
 
+    @ToString
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UpdateRequest {
-
-        @ApiParam(value = "회원 비밀번호")
-        @NotBlank(message = "비밀번호를 입력해주세요")
-        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
-        @Pattern(regexp = PASSWORD, message = "숫자, 문자, 특수문자 3가지를 조합해 입력해주세요")
-        private String password;
 
         @ApiParam(value = "회원 닉네임")
         @NotBlank(message = "닉네임을 입력해주세요")
@@ -164,8 +156,8 @@ public class UserDto {
         private String phone;
 
         @ApiParam(value = "회원정보 공개여부")
-        @NotBlank
-        private boolean isActivated;
+        @NotNull
+        private Boolean isActivated;
 
         @ApiParam(value = "회원 선호 진행방식")
         @NotBlank
@@ -180,27 +172,35 @@ public class UserDto {
         private String information;
 
         @ApiParam(value = "회원 기술스택")
-        @NotBlank
+        @NotNull
         private List<String> skills;
+    }
 
-        public User toEntity() {
-            return User.builder()
-                    .nickname(this.getNickname())
-                    .password(this.getPassword())
-                    .phone(this.getPhone())
-                    .preferredMethod(this.getPreferredMethod())
-                    .region(this.getRegion())
-                    .information(this.getInformation())
-                    .isActivated(this.isActivated)
-                    .build();
-        }
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class UpdatePasswordRequest {
+        @ApiParam(value = "기존 회원 비밀번호")
+        @NotBlank(message = "기존 비밀번호를 입력해주세요")
+        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
+        @Pattern(regexp = PASSWORD, message = "숫자, 문자, 특수문자 3가지를 조합해 입력해주세요")
+        private String currentPassword;
+
+        @ApiParam(value = "변경할 회원 비밀번호")
+        @NotBlank(message = "기존 비밀번호를 입력해주세요")
+        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하로 입력해주세요")
+        @Pattern(regexp = PASSWORD, message = "숫자, 문자, 특수문자 3가지를 조합해 입력해주세요")
+        private String newPassword;
 
         public boolean checkPassword(EncryptionService encryptionService, String encryptedPassword) {
-            return encryptionService.isSamePassword(this.password, encryptedPassword);
+            return encryptionService.isSamePassword(this.currentPassword, encryptedPassword);
+        }
+
+        public boolean isAlreadyMyPassword() {
+            return currentPassword.equals(newPassword);
         }
 
         public void encryptPassword(EncryptionService encryptionService) {
-            this.password = encryptionService.encrypt(password);
+            this.newPassword = encryptionService.encrypt(newPassword);
         }
     }
 

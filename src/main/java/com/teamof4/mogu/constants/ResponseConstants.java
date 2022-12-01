@@ -41,6 +41,10 @@ public class ResponseConstants {
             new ResponseEntity<>("이미 내가 사용중인 비밀번호입니다.", HttpStatus.CONFLICT);
     public static final ResponseEntity<String> ALREADY_MY_PHONE =
             new ResponseEntity<>("이미 내가 사용중인 휴대폰 번호입니다.", HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> IMAGE_NOT_FOUND =
+            new ResponseEntity<>("이미지 파일을 찾는데 실패했습니다.", HttpStatus.NOT_FOUND);
+    public static final ResponseEntity<String> USERSKILL_NOT_FOUND =
+            new ResponseEntity<>("해당 유저의 해당 기술스택을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
     public static final ResponseEntity<String> NOT_LOGINED_USER =
             new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.NOT_FOUND);

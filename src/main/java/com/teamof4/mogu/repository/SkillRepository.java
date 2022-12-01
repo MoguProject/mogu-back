@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
 
-    Skill findBySkillName(String skillName);
+    Optional<Skill> findBySkillName(String skillName);
 }
