@@ -42,8 +42,11 @@ public class Post extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Like> likes;
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Reply> replies;
 
     public void updatePost(String title, String content) {
         this.title = title;

@@ -8,6 +8,7 @@ import com.teamof4.mogu.entity.*;
 import com.teamof4.mogu.exception.post.CategoryNotFoundException;
 import com.teamof4.mogu.exception.post.LikeNotFoundException;
 import com.teamof4.mogu.exception.post.PostNotFoundException;
+import com.teamof4.mogu.exception.post.ReplyNotFoundException;
 import com.teamof4.mogu.exception.user.UserNotFoundException;
 import com.teamof4.mogu.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.teamof4.mogu.constants.SortStatus.*;
+import static com.teamof4.mogu.dto.ReplyDto.*;
 
 @Service
 @Log4j2
@@ -37,6 +39,7 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final ImagePostRepository imagePostRepository;
     private final LikeRepository likeRepository;
+    private final ReplyRepository replyRepository;
     private final ImageService imageService;
 
     public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable,
@@ -65,9 +68,14 @@ public class PostService {
 
         List<Image> images = getImages(postId);
 
+        List<Reply> replyList = post.getReplies().stream()
+                .filter(reply -> reply.getParentReply() == null)
+                .collect(Collectors.toList());
+
         return PostDto.Response.builder()
                 .post(post)
                 .images(images)
+                .replies(replyConvertToDto(replyList))
                 .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
 
     }
@@ -146,6 +154,47 @@ public class PostService {
                 .count(likeRepository.countByPost(post)).build();
     }
 
+    public Long saveSuperReply(Long currentUserId, SuperRequest dto) {
+
+        Reply reply = Reply.createReply(getPost(dto.getPostId()), getUser(currentUserId), dto.getContent());
+
+        replyRepository.save(reply);
+        return reply.getId();
+    }
+
+    public Long saveSubReply(Long currentUserId, Request dto) {
+        Reply parentReply = replyRepository.findById(dto.getReplyId())
+                .orElseThrow(() -> new IllegalStateException("댓글이 존재하지 않습니다."));
+
+        Reply reply = Reply.createReply(parentReply.getPost(), getUser(currentUserId), dto.getContent());
+        reply.setParentUser(parentReply.getUser());
+
+        if (parentReply.getParentReply() == null) {
+            reply.setParentReply(parentReply);
+        } else {
+            reply.setParentReply(parentReply.getParentReply());
+        }
+
+        replyRepository.save(reply);
+        return reply.getId();
+    }
+
+    public Long updateReply(Request dto) {
+        Reply reply = getReply(dto.getReplyId());
+        reply.updateReply(dto.getContent());
+
+        replyRepository.save(reply);
+
+        return reply.getId();
+    }
+
+    public void deleteReply(Long replyId) {
+        Reply reply = getReply(replyId);
+        reply.deleteReply();
+
+        replyRepository.save(reply);
+    }
+
     private boolean isLiked(User user, Post post) {
         return likeRepository.findByUserAndPost(user, post).isPresent();
     }
@@ -197,6 +246,31 @@ public class PostService {
         return responseList;
     }
 
+    public List<Response> replyConvertToDto(List<Reply> replies) {
+        List<Response> responseList = new ArrayList<>();
+
+        for (Reply reply : replies) {
+            String targetUserNickname = "";
+            if (reply.getParentUser() != null) {
+                targetUserNickname = reply.getParentUser().getNickname();
+            }
+
+            List<Response> children = new ArrayList<>();
+            if (!reply.getChildren().isEmpty()) {
+                children = replyConvertToDto(reply.getChildren());
+            }
+            Response response = Response.builder()
+                    .reply(reply).targetNickname(targetUserNickname)
+                    .children(children)
+                    .build();
+
+            responseList.add(response);
+        }
+
+        return responseList;
+    }
+
+
     @Transactional
     public void saveImage(List<MultipartFile> images, Post post) {
         for (MultipartFile image : images) {
@@ -218,5 +292,10 @@ public class PostService {
     public Post getPost(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("존재하지 않는 게시글입니다."));
+    }
+
+    private Reply getReply(Long replyId) {
+        return replyRepository.findById(replyId)
+                .orElseThrow(() -> new ReplyNotFoundException("댓글이 존재하지 않습니다."));
     }
 }

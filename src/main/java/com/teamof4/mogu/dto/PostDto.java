@@ -96,14 +96,17 @@ public class PostDto {
         @ApiModelProperty(notes = "게시글 이미지 리스트")
         private List<Image> imageList;
 
-        @ApiModelProperty(notes = "게시글 생성일")
+        @ApiModelProperty(notes = "댓글 리스트")
+        private List<ReplyDto.Response> replyList;
+
+        @ApiModelProperty(notes = "게시글 생성 시간")
         private LocalDateTime createdAt;
 
-        @ApiModelProperty(notes = "게시글 수정일")
+        @ApiModelProperty(notes = "게시글 수정 시간")
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, List<Image> images, boolean isLiked) {
+        public Response(Post post, List<Image> images, List<ReplyDto.Response> replies, boolean isLiked) {
             this.id = post.getId();
             this.userId = post.getUser().getId();
             this.categoryId = post.getCategory().getId();
@@ -115,6 +118,7 @@ public class PostDto {
             this.likeCount = post.getLikes().size();
             this.likeStatus = isLiked;
             this.imageList = images;
+            this.replyList = replies;
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();
         }
