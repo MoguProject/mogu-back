@@ -2,6 +2,7 @@ package com.teamof4.mogu.exception;
 
 import com.teamof4.mogu.exception.image.FailedImageUploadException;
 import com.teamof4.mogu.exception.image.FailedImageConvertException;
+import com.teamof4.mogu.exception.image.ImageNotFoundException;
 import com.teamof4.mogu.exception.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -53,13 +54,6 @@ public class MoguExceptionHandler {
         return WRONG_PASSWORD;
     }
 
-    @ExceptionHandler(AlreadyMyNicknameException.class)
-    public final ResponseEntity<String> handleAlreadyMyNicknameException(
-            AlreadyMyNicknameException exception) {
-        log.debug("이미 내가 사용중인 닉네임입니다.");
-        return ALREADY_MY_NICKNAME;
-    }
-
     @ExceptionHandler(AlreadyMyPasswordException.class)
     public final ResponseEntity<String> handleAlreadyMyPasswordException(
             AlreadyMyPasswordException exception) {
@@ -67,11 +61,18 @@ public class MoguExceptionHandler {
         return ALREADY_MY_PASSWORD;
     }
 
-    @ExceptionHandler(AlreadyMyPhoneException.class)
-    public final ResponseEntity<String> handleAlreadyMyPhoneException(
-            AlreadyMyPhoneException exception) {
-        log.debug("이미 내가 사용중인 휴대폰 번호입니다.");
-        return ALREADY_MY_PHONE;
+    @ExceptionHandler(UserSkillNotFoundException.class)
+    public final ResponseEntity<String> handleUserSkillNotFoundException(
+            UserSkillNotFoundException exception) {
+        log.debug("해당 유저의 해당 기술스택을 찾을 수 없습니다.");
+        return USERSKILL_NOT_FOUND;
+    }
+
+    @ExceptionHandler(ImageNotFoundException.class)
+    public final ResponseEntity<String> handleImageNotFoundException(
+            ImageNotFoundException exception) {
+        log.debug("이미지 파일을 찾는데 실패했습니다.", exception);
+        return IMAGE_NOT_FOUND;
     }
 
     @ExceptionHandler(FailedImageConvertException.class)

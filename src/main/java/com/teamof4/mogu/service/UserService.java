@@ -4,13 +4,11 @@ import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.dto.UserDto.LoginRequest;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
-import com.teamof4.mogu.entity.Skill;
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.entity.UserSkill;
-import com.teamof4.mogu.exception.AlreadyMyNicknameException;
-import com.teamof4.mogu.exception.AlreadyMyPasswordException;
-import com.teamof4.mogu.exception.AlreadyMyPhoneException;
+import com.teamof4.mogu.exception.image.ImageNotFoundException;
 import com.teamof4.mogu.exception.user.*;
+import com.teamof4.mogu.repository.ImageRepository;
 import com.teamof4.mogu.repository.SkillRepository;
 import com.teamof4.mogu.repository.UserRepository;
 import com.teamof4.mogu.repository.UserSkillRepository;
@@ -24,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.teamof4.mogu.constants.DefaultImageConstants.DEFAULT_PROFILE_IMAGE_ID;
 
 @Slf4j
 @Service
@@ -32,6 +31,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final ImageService imageService;
+    private final ImageRepository imageRepository;
     private final UserRepository userRepository;
     private final UserSkillRepository userSkillRepository;
     private final SkillRepository skillRepository;
@@ -40,12 +40,13 @@ public class UserService {
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public void save(SaveRequest requestDto, MultipartFile profileImage) {
+    public void save(SaveRequest requestDto) {
         checkDuplicatedForCreate(requestDto);
 
         requestDto.encryptPassword(encryptionService);
         User user = requestDto.toEntity();
-        user.setImage(imageService.saveProfileImage(profileImage));
+        user.setImage(imageRepository.findById(DEFAULT_PROFILE_IMAGE_ID)
+                .orElseThrow(() -> new ImageNotFoundException("기본 프로필 이미지를 찾지 못했습니다.")));
 
         userRepository.save(user);
     }
@@ -102,9 +103,8 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
 
         checkDuplicatedForUpdate(user, updateRequest);
-        updateRequest.encryptPassword(encryptionService);
+        user.updateUser(updateRequest);
         updateSkills(user, updateRequest);
-        user = updateRequest.toEntity();
         //profileImage가 null이면 수정 X
         if (!profileImage.isEmpty()) {
             user.setImage(imageService.updateProfileImage(profileImage));
@@ -114,23 +114,16 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public void checkDuplicatedForUpdate(User user, UpdateRequest requestDto) {
-        if (user.getNickname().equals(requestDto.getNickname())) {
-            throw new AlreadyMyNicknameException();
-        }
-        if (user.getPhone().equals(requestDto.getPhone())) {
-            throw new AlreadyMyPhoneException();
-        }
-        if (requestDto.checkPassword(encryptionService, user.getPassword())) {
-            throw new AlreadyMyPasswordException();
-        }
-        if (userRepository.existsByNickname(requestDto.getNickname())) {
+        if (!user.getNickname().equals(requestDto.getNickname())
+                && userRepository.existsByNickname(requestDto.getNickname())) {
             throw new DuplicatedNicknameException();
         }
-
-        if (userRepository.existsByPhone(requestDto.getPhone())) {
+        if (!user.getPhone().equals(requestDto.getPhone())
+                && userRepository.existsByPhone(requestDto.getPhone())) {
             throw new DuplicatedPhoneException();
         }
     }
+
 
     @Transactional
     public void updateSkills(User user, UpdateRequest updateRequest) {
@@ -144,7 +137,7 @@ public class UserService {
                 .stream()
                 .filter(updating -> user.getUserSkillNames().stream().noneMatch(original -> updating.equals(original)))
                 .map(skillName -> skillRepository.findBySkillName(skillName))
-                .forEach(skill -> userSkillRepository.save(UserSkill.of(user, skill)));
+                .forEach(skill -> userSkillRepository.save(UserSkill.of(user, skill.orElseThrow(() -> new UserSkillNotFoundException()))));
     }
 
     @Transactional
@@ -163,5 +156,22 @@ public class UserService {
 
     public String certificateByEmail(EmailCertificationRequest requestDto) {
         return emailService.sendCertificationEmail(requestDto.getEmail());
+    }
+
+    public void updatePassword(UpdatePasswordRequest updatePasswordRequest,
+                               Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+
+        if (!updatePasswordRequest.checkPassword(encryptionService, user.getPassword())) {
+            throw new WrongPasswordException();
+        }
+        if (updatePasswordRequest.isAlreadyMyPassword()) {
+            throw new AlreadyMyPasswordException();
+        }
+
+        updatePasswordRequest.encryptPassword(encryptionService);
+        user.updatePassword(updatePasswordRequest.getNewPassword());
+        userRepository.save(user);
     }
 }

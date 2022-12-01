@@ -22,21 +22,15 @@ public class ImageService {
     private final int SPLIT_INDEX = 57;
 
     @Transactional
-    public Image saveProfileImage(MultipartFile profileImage) {
-        if (profileImage.isEmpty()) {
-            return imageRepository.findById(DEFAULT_PROFILE_IMAGE_ID)
-                    .orElseThrow(() -> new FailedImageUploadException("기본 이미지를 찾지 못했습니다."));
-        }
-        String imageUrl = awsS3Service.uploadImage(profileImage);
-        Image image = ImageDto.of(imageUrl);
-
-        return imageRepository.save(image);
+    public Image saveDefaultProfileImage() {
+        return imageRepository.findById(DEFAULT_PROFILE_IMAGE_ID)
+                .orElseThrow(() -> new FailedImageUploadException("기본 이미지를 찾지 못했습니다."));
     }
 
     @Transactional
     public Image updateProfileImage(MultipartFile profileImage) {
         String imageUrl = awsS3Service.uploadImage(profileImage);
-        Image image = ImageDto.of(imageUrl);
+        Image image = imageRepository.save(ImageDto.of(imageUrl));
 
         return image;
     }
@@ -44,7 +38,7 @@ public class ImageService {
     //프로필 이미지가 기본 이미지가 아닐경우에만 이미지 테이블 삭제
     @Transactional
     public void deleteProfileImage(Image image) {
-        if(image.getId()!=DEFAULT_PROFILE_IMAGE_ID) {
+        if (image.getId() != DEFAULT_PROFILE_IMAGE_ID) {
             deleteImage(image);
         }
     }
