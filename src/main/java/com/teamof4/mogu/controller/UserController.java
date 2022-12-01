@@ -28,7 +28,7 @@ public class UserController {
 
     @PostMapping("/create")
     @ApiOperation(value = "회원 등록")
-    public ResponseEntity<Void> createUser(@Valid @RequestPart SaveRequest requestDto) {
+    public ResponseEntity<Void> createUser(@Valid @RequestBody SaveRequest requestDto) {
         userService.save(requestDto);
 
         return CREATED;
