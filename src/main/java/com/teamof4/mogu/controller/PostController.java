@@ -1,6 +1,9 @@
 package com.teamof4.mogu.controller;
 
+import com.teamof4.mogu.constants.SortStatus;
+import com.teamof4.mogu.dto.LikeDto;
 import com.teamof4.mogu.dto.PostDto;
+import com.teamof4.mogu.exception.user.UserNotLoginedException;
 import com.teamof4.mogu.service.PostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static com.teamof4.mogu.constants.SortStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -28,10 +33,19 @@ public class PostController {
      * 위의 카테고리 아이디로 조회할 때만 사용한다.
      */
     @GetMapping("/list/{categoryId}")
-    @ApiOperation(value = "커뮤니티 게시글 전체 조회", notes = "카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "커뮤니티 게시글 전체 조회(생성일 기준)", notes = "카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<PostDto.Response>> getPostList(@PathVariable Long categoryId,
-                                                              @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(postService.getPostList(categoryId, pageable));
+                                                              @AuthenticationPrincipal Long userId,
+             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostList(categoryId, pageable, userId, DEFAULT));
+    }
+
+    @GetMapping("/list/likes/{categoryId}")
+    @ApiOperation(value = "커뮤니티 게시글 전체 조회(좋아요 수 기준)", notes = "카테고리 별, 좋아요 순 기준 내림차 순으로 출력한다.")
+    public ResponseEntity<Page<PostDto.Response>> getLikesPostList(@PathVariable Long categoryId,
+                                                                   @AuthenticationPrincipal Long userId,
+                                                                   @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostList(categoryId, pageable, userId, LIKES));
     }
 
     @GetMapping("/post/{id}")
@@ -43,8 +57,11 @@ public class PostController {
 
     @PostMapping("/create")
     @ApiOperation(value = "커뮤니티 게시글 등록")
-    public ResponseEntity<Long> savePost(@Valid PostDto.SaveRequest dto) {
-        return ResponseEntity.ok(postService.savePost(dto));
+    public ResponseEntity<Long> savePost(@Valid PostDto.SaveRequest dto, @AuthenticationPrincipal Long userId) {
+        if (userId == null) {
+            throw new UserNotLoginedException();
+        }
+        return ResponseEntity.ok(postService.savePost(dto, userId));
     }
 
     @PostMapping("/update/{postId}")
@@ -58,5 +75,16 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/like/{postId}")
+    @ApiOperation(value = "좋아요 등록 및 삭제")
+    public ResponseEntity<LikeDto> hitLike(@PathVariable Long postId,
+                                           @AuthenticationPrincipal Long userId) {
+        if (userId == null) {
+            throw new UserNotLoginedException();
+        }
+
+        return ResponseEntity.ok(postService.likeProcess(postId, userId));
     }
 }

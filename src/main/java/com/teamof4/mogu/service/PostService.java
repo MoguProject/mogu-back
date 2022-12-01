@@ -1,9 +1,12 @@
 package com.teamof4.mogu.service;
 
 import com.amazonaws.util.CollectionUtils;
+import com.teamof4.mogu.constants.SortStatus;
+import com.teamof4.mogu.dto.LikeDto;
 import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.entity.*;
-import com.teamof4.mogu.exception.category.CategoryNotFoundException;
+import com.teamof4.mogu.exception.post.CategoryNotFoundException;
+import com.teamof4.mogu.exception.post.LikeNotFoundException;
 import com.teamof4.mogu.exception.post.PostNotFoundException;
 import com.teamof4.mogu.exception.user.UserNotFoundException;
 import com.teamof4.mogu.repository.*;
@@ -17,8 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.teamof4.mogu.constants.SortStatus.*;
 
 @Service
 @Log4j2
@@ -30,23 +36,22 @@ public class PostService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ImagePostRepository imagePostRepository;
+    private final LikeRepository likeRepository;
     private final ImageService imageService;
 
-    public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable) {
+    public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable,
+                                              Long currentUserId, SortStatus status) {
 
-        Page<Post> posts = postRepository.findAll(pageable);
+        Page<Post> posts = new PageImpl<>(Collections.emptyList());
+        Category category = getCategory(categoryId);
 
-        List<PostDto.Response> responseList = new ArrayList<>();
-
-        for (Post post : posts) {
-            PostDto.Response response = PostDto.Response.builder()
-                    .post(post)
-                    .images(getImages(post.getId())).build();
-            responseList.add(response);
+        if (status.equals(DEFAULT)) {
+            posts = postRepository.findAll(pageable, category);
+        } else if(status.equals(LIKES)) {
+            posts = postRepository.findAllLikesDesc(pageable, category);
         }
-        return new PageImpl<>(responseList.stream()
-                .filter(dto -> dto.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList()));
+
+        return new PageImpl<>(getResponses(posts, currentUserId));
     }
 
     public PostDto.Response getPostDetails(Long postId, Long currentUserId) {
@@ -62,7 +67,8 @@ public class PostService {
 
         return PostDto.Response.builder()
                 .post(post)
-                .images(images).build();
+                .images(images)
+                .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
 
     }
 
@@ -79,9 +85,9 @@ public class PostService {
     }
 
     @Transactional
-    public Long savePost(PostDto.SaveRequest requestDTO) {
+    public Long savePost(PostDto.SaveRequest requestDTO, Long currentUserId) {
 
-        Post post = requestDTO.toEntity(getUser(requestDTO.getUserId()), getCategory(requestDTO.getCategoryId()));
+        Post post = requestDTO.toEntity(getUser(currentUserId), getCategory(requestDTO.getCategoryId()));
 
         postRepository.save(post);
 
@@ -105,7 +111,6 @@ public class PostService {
 
         updatePostImageProcess(post, multipartFiles, imagePosts);
 
-
         postRepository.save(post);
 
         return post.getId();
@@ -117,6 +122,42 @@ public class PostService {
         post.changeStatus();
 
         postRepository.save(post);
+    }
+
+    public LikeDto likeProcess(Long postId, Long currentUserId) {
+
+        User user = getUser(currentUserId);
+        Post post = getPost(postId);
+
+        boolean likeStatus = false;
+        if (!isLiked(user, post)) {
+            likeRepository.save(Like.builder()
+                    .user(user)
+                    .post(post).build());
+            likeStatus = true;
+        } else {
+            Like like = likeRepository.findByUserAndPost(user, post)
+                    .orElseThrow(() -> new LikeNotFoundException("좋아요를 누른 게시물이 없습니다."));
+            likeRepository.delete(like);
+        }
+
+        return LikeDto.builder()
+                .likeStatus(likeStatus)
+                .count(likeRepository.countByPost(post)).build();
+    }
+
+    private boolean isLiked(User user, Post post) {
+        return likeRepository.findByUserAndPost(user, post).isPresent();
+    }
+
+    public boolean isLikedByCurrentUser(Long currentUserId, Post post) {
+        boolean isLiked = false;
+
+        if (currentUserId != null && isLiked(getUser(currentUserId), post)) {
+            isLiked = true;
+        }
+
+        return isLiked;
     }
 
     private void updatePostImageProcess(Post post, List<MultipartFile> multipartFiles, List<ImagePost> imagePosts) {
@@ -141,6 +182,19 @@ public class PostService {
                 saveImage(multipartFiles, post);
             }
         }
+    }
+
+    private List<PostDto.Response> getResponses(Page<Post> posts, Long currentUserId) {
+        List<PostDto.Response> responseList = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostDto.Response response = PostDto.Response.builder()
+                    .post(post)
+                    .images(getImages(post.getId()))
+                    .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
+            responseList.add(response);
+        }
+        return responseList;
     }
 
     @Transactional

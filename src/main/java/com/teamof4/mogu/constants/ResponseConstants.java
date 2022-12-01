@@ -41,4 +41,7 @@ public class ResponseConstants {
             new ResponseEntity<>("이미 내가 사용중인 비밀번호입니다.", HttpStatus.CONFLICT);
     public static final ResponseEntity<String> ALREADY_MY_PHONE =
             new ResponseEntity<>("이미 내가 사용중인 휴대폰 번호입니다.", HttpStatus.CONFLICT);
+
+    public static final ResponseEntity<String> NOT_LOGINED_USER =
+            new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.NOT_FOUND);
 }
