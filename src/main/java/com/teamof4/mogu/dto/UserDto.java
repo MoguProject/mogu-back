@@ -88,14 +88,10 @@ public class UserDto {
     }
 
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     public static class LoginResponse {
-
-        @ApiModelProperty(notes = "회원 닉네임")
-        private String nickname;
-
-        @ApiModelProperty(notes = "회원 프로필 이미지 URL")
-        private String profileImageUrl;
 
         @ApiModelProperty(notes = "로그인 인증 토큰")
         private String token;
@@ -103,6 +99,16 @@ public class UserDto {
         public void createToken(String token) {
             this.token = token;
         }
+    }
+
+    @Getter
+    @Builder
+    public static class LoginInfoResponse {
+        @ApiModelProperty(notes = "로그인 유저 닉네임")
+        private String nickname;
+
+        @ApiModelProperty(notes = "로그인 유저 프로필 이미지 주소")
+        private String profileImageUrl;
     }
 
     @Getter

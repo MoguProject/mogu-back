@@ -1,10 +1,7 @@
 package com.teamof4.mogu.entity;
 
 import com.teamof4.mogu.dto.UserDto;
-import com.teamof4.mogu.dto.UserDto.LoginResponse;
-import com.teamof4.mogu.dto.UserDto.UpdatePasswordRequest;
-import com.teamof4.mogu.dto.UserDto.UpdateRequest;
-import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
+import com.teamof4.mogu.dto.UserDto.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -65,8 +62,8 @@ public class User extends BaseTimeEntity {
         this.image = image;
     }
 
-    public LoginResponse toLoginResponse() {
-        return LoginResponse.builder()
+    public LoginInfoResponse toLoginInfoResponse() {
+        return LoginInfoResponse.builder()
                 .nickname(this.nickname)
                 .profileImageUrl(this.image.getImageUrl())
                 .build();

@@ -35,15 +35,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    @ApiOperation(value = "로그인")
+    @ApiOperation(value = "로그인한 유저 토큰 반환")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest requestDto) {
         LoginResponse loginResponse = userService.login(requestDto);
 
         return ResponseEntity.ok(loginResponse);
     }
 
+    @GetMapping("/login/info")
+    @ApiOperation(value = "로그인 정보 반환")
+    public ResponseEntity<LoginInfoResponse> getLoginInformation(@AuthenticationPrincipal Long userId) {
+        LoginInfoResponse loginInfoResponse = userService.getLoginInformation(userId);
+
+        return ResponseEntity.ok(loginInfoResponse);
+    }
+
     @GetMapping("/mypage")
-    @ApiOperation(value = "마이페이지 회원정보 출력")
+    @ApiOperation(value = "마이페이지 회원정보 반환")
     public ResponseEntity<UserInfoResponse> getMyPageInformation(
             @AuthenticationPrincipal Long userId) {
         UserInfoResponse userInfoResponse = userService.getMyPageInformation(userId);
