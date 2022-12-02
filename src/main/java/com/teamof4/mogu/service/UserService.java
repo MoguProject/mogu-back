@@ -17,6 +17,9 @@ import com.teamof4.mogu.util.certification.EmailService;
 import com.teamof4.mogu.util.encryption.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfInt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,8 +84,7 @@ public class UserService {
         }
 
         String token = tokenProvider.create(user);
-        LoginResponse loginResponse = user.toLoginResponse();
-        loginResponse.createToken(token);
+        LoginResponse loginResponse = new LoginResponse(token);
 
         return loginResponse;
     }
@@ -95,6 +97,16 @@ public class UserService {
         UserInfoResponse userInfoResponse = user.toUserInfoResponse();
 
         return userInfoResponse;
+    }
+
+    @Transactional(readOnly = true)
+    public LoginInfoResponse getLoginInformation(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
+
+        LoginInfoResponse loginInfoResponse = user.toLoginInfoResponse();
+
+        return loginInfoResponse;
     }
 
     @Transactional
@@ -174,4 +186,5 @@ public class UserService {
         user.updatePassword(updatePasswordRequest.getNewPassword());
         userRepository.save(user);
     }
+
 }

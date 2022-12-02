@@ -2,6 +2,7 @@ package com.teamof4.mogu.security;
 
 import com.teamof4.mogu.entity.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -18,7 +20,7 @@ import java.util.Date;
 @Service
 public class TokenProvider {
 
-    private static final String SECRET_KEY = "DJFI!@fdasaf()#sdfjiosdf2&^%$#EDFGHHGFes";
+    private static final String SECRET_KEY = "DJFI!@fdasaf()#sdfjiosdf2&^%$#EDFGHHGs";
 
     Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
@@ -27,7 +29,7 @@ public class TokenProvider {
      */
     public String create(User user) {
         // 기한 설정
-        Date expiryDate = Date.from(Instant.now().plus(24, ChronoUnit.HOURS));
+        Date expiryDate = Date.from(Instant.now().plus(12, ChronoUnit.HOURS));
         // JWT 토큰 생성
         return Jwts.builder()
                 //헤더(header) 에 들어갈 내용 및 서명을 하기위한 SECRET KEY
