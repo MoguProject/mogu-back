@@ -6,6 +6,7 @@ import com.teamof4.mogu.exception.user.ExpiredTokenException;
 import com.teamof4.mogu.exception.user.WrongTokenSignatureException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -23,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.SignatureException;
 
 import static com.teamof4.mogu.constants.JwtConstants.EXPIRED_TOKEN;
 
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
-                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException, JwtException {
         try {
             //요청에서 토큰 가져오기
             String token = parsBearerToken(request);
@@ -52,17 +52,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 AbstractAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userId, null, AuthorityUtils.NO_AUTHORITIES);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authenticationToken);
-
                 SecurityContextHolder.setContext(securityContext);
             }
         } catch (ExpiredJwtException exception) {
             log.warn("토큰 기한 만료");
-            request.setAttribute("exception", EXPIRED_TOKEN);
             throw new JwtException("만료된 토큰입니다.");
-        } catch (Exception exception) {
+        } catch (SignatureException exception) {
+            log.warn("토큰 서명 불일치");
+            request.setAttribute("exception", "만료토큰 777");
+            response.getWriter().write("만료토큰 123");
+            throw new JwtException("서명이 일치하지 않는 토큰입니다.");
+        }
+        catch (Exception exception) {
             logger.error("Could not set user authentication in security context", exception);
             log.info("토큰 에러");
         }

@@ -1,11 +1,17 @@
 package com.teamof4.mogu.controller;
 
+import com.teamof4.mogu.dto.PostDto;
+import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
+import com.teamof4.mogu.service.PostService;
 import com.teamof4.mogu.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +31,7 @@ import static com.teamof4.mogu.dto.UserDto.*;
 public class UserController {
 
     private final UserService userService;
+    private final PostService postService;
 
     @PostMapping("/create")
     @ApiOperation(value = "회원 등록")
@@ -94,5 +101,24 @@ public class UserController {
         String certificationCode = userService.certificateByEmail(requestDto);
 
         return ResponseEntity.ok(certificationCode);
+    }
+
+    @PostMapping("/email/create/new-password")
+    @ApiOperation(value = "새 랜덤 비밀번호 생성")
+    public ResponseEntity<Void> createNewPassword(
+            @Valid @RequestBody CreatePasswordRequest requestDto) {
+        userService.createNewPassword(requestDto);
+
+        return OK;
+    }
+
+    @GetMapping("/mypage/post/like")
+    @ApiOperation(value = "마이페이지 내가 좋아요 한 게시물 리스트")
+    public ResponseEntity<Page<PostDto.Response>> getMyPostsByLiked(
+            @PageableDefault Pageable pageable,
+            @AuthenticationPrincipal Long userId) {
+        Page<PostDto.Response> pageResponse = userService.getMyPostsByLiked(userId, pageable);
+
+        return ResponseEntity.ok(pageResponse);
     }
 }

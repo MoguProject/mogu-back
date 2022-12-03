@@ -37,8 +37,8 @@ public class WebSecurityConfig {
                 .cors()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
-//                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 
         http.addFilterBefore(jwtCustomExceptionFilter, CorsFilter.class);
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);

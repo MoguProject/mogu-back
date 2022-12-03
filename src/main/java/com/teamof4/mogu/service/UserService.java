@@ -1,5 +1,7 @@
 package com.teamof4.mogu.service;
 
+import com.teamof4.mogu.dto.PostDto;
+import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.dto.UserDto.LoginRequest;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
@@ -20,11 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfInt;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.teamof4.mogu.constants.DefaultImageConstants.DEFAULT_PROFILE_IMAGE_ID;
 
@@ -187,4 +192,16 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void createNewPassword(CreatePasswordRequest requestDto) {
+        User user = userRepository.findByEmailAndName(requestDto.getEmail(), requestDto.getName())
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+        String newPassword = emailService.sendNewPasswordEmail(requestDto.getEmail());
+        user.updatePassword(UserDto.encryptPassword(encryptionService, newPassword));
+        userRepository.save(user);
+    }
+
+    public Page<PostDto.Response> getMyPostsByLiked(Long userId, Pageable pageable) {
+        return null;
+    }
 }
