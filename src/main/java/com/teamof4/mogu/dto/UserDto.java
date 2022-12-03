@@ -2,6 +2,7 @@ package com.teamof4.mogu.dto;
 
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.util.encryption.EncryptionService;
+import io.swagger.annotations.Api;
 import lombok.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
@@ -223,9 +224,23 @@ public class UserDto {
 
     @Getter
     public static class EmailCertificationRequest {
-
         @ApiParam(value = "회원 메일 주소")
         @NotBlank(message = "이메일 주소를 입력해주세요")
         private String email;
+    }
+
+    @Getter
+    public static class CreatePasswordRequest {
+        @ApiParam(value = "가입한 이메일 주소")
+        @NotBlank(message = "이메일 주소를 입력해주세요")
+        private String email;
+
+        @ApiParam(value = "본인 이름")
+        @NotBlank(message = "이름을 입력해주세요")
+        private String name;
+    }
+
+    public static String encryptPassword(EncryptionService encryptionService, String password) {
+        return encryptionService.encrypt(password);
     }
 }
