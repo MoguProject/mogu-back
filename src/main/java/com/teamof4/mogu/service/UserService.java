@@ -6,14 +6,12 @@ import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.dto.UserDto.LoginRequest;
 import com.teamof4.mogu.dto.UserDto.LoginResponse;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
+import com.teamof4.mogu.entity.Post;
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.entity.UserSkill;
 import com.teamof4.mogu.exception.image.ImageNotFoundException;
 import com.teamof4.mogu.exception.user.*;
-import com.teamof4.mogu.repository.ImageRepository;
-import com.teamof4.mogu.repository.SkillRepository;
-import com.teamof4.mogu.repository.UserRepository;
-import com.teamof4.mogu.repository.UserSkillRepository;
+import com.teamof4.mogu.repository.*;
 import com.teamof4.mogu.security.TokenProvider;
 import com.teamof4.mogu.util.certification.EmailService;
 import com.teamof4.mogu.util.encryption.EncryptionService;
@@ -41,6 +39,7 @@ public class UserService {
     private final ImageService imageService;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
     private final UserSkillRepository userSkillRepository;
     private final SkillRepository skillRepository;
     private final EncryptionService encryptionService;
@@ -76,7 +75,7 @@ public class UserService {
     }
 
     @Transactional
-    public LoginResponse login(LoginRequest loginRequest) {
+    public String login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
 
@@ -87,11 +86,9 @@ public class UserService {
         if (!loginRequest.checkPassword(encryptionService, user.getPassword())) {
             throw new UserNotFoundException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
-
         String token = tokenProvider.create(user);
-        LoginResponse loginResponse = new LoginResponse(token);
 
-        return loginResponse;
+        return token;
     }
 
     @Transactional(readOnly = true)
@@ -201,7 +198,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Page<PostDto.Response> getMyPostsByLiked(Long userId, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<Post> getMyPostsByLiked(Long userId, Pageable pageable) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+//        Page<Post> posts = postRepository.findAllByUserAndLiked(pageable, user);
         return null;
     }
 }

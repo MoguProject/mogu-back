@@ -21,9 +21,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.teamof4.mogu.constants.JwtConstants.EXPIRED_TOKEN;
 
@@ -73,10 +77,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String parsBearerToken(HttpServletRequest httpServletRequest) {
-        String bearerToken = httpServletRequest.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+        String token = Arrays
+                .stream(httpServletRequest.getCookies())
+                .filter(cookie -> cookie.getName().equals("access-token"))
+                .collect(Collectors.toList())
+                .get(0).getValue();
+        return token;
     }
 }

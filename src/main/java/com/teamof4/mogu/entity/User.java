@@ -49,9 +49,9 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", fetch = LAZY)
     private List<UserSkill> userSkills = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "user")
-//    private List<PostLiked> postLikeds = new ArrayList<>();
-//
+    @OneToMany(mappedBy = "user")
+    private List<Like> postLikeds = new ArrayList<>();
+
 //    @OneToMany(mappedBy = "user")
 //    private List<Post> posts = new ArrayList<>();
 //
