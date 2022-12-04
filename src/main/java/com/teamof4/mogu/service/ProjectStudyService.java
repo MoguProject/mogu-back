@@ -88,7 +88,7 @@ public class ProjectStudyService {
         return ProjectStudyDto.Response.builder()
                 .post(post)
                 .projectStudy(projectStudy)
-                .images(postService.getImages(postId))
+                .images(postService.getImages(post.getImages()))
                 .isLiked(postService.isLikedByCurrentUser(currentUserId, post)).build();
 
     }
@@ -140,12 +140,11 @@ public class ProjectStudyService {
         List<ProjectStudyDto.Response> responseList = new ArrayList<>();
 
         for (ProjectStudy post : projectStudies) {
-            List<Image> images = postService.getImages(post.getPost().getId());
 
             ProjectStudyDto.Response response = ProjectStudyDto.Response.builder()
                     .post(post.getPost())
                     .projectStudy(post)
-                    .images(images)
+                    .images(postService.getImages(post.getPost().getImages()))
                     .isLiked(postService.isLikedByCurrentUser(currentUserId, post.getPost())).build();
 
             responseList.add(response);

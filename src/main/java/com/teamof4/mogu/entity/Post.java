@@ -42,6 +42,9 @@ public class Post extends BaseTimeEntity {
 
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<ImagePost> images;
+
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Like> likes;
 

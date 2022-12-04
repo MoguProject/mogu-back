@@ -40,7 +40,7 @@ public class ProjectStudy {
     private LocalDate startAt;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "projectStudy")
+    @OneToMany(mappedBy = "projectStudy", fetch = FetchType.LAZY)
     private List<PostSkill> postSkills = new ArrayList<>();
 
     public void updateProjectStudy(ProjectStudyDto.Request dto) {
