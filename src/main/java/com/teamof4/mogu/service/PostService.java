@@ -66,30 +66,16 @@ public class PostService {
             postRepository.save(post);
         }
 
-        List<Image> images = getImages(postId);
-
         List<Reply> replyList = post.getReplies().stream()
                 .filter(reply -> reply.getParentReply() == null)
                 .collect(Collectors.toList());
 
         return PostDto.Response.builder()
                 .post(post)
-                .images(images)
+                .images(getImages(post.getImages()))
                 .replies(replyConvertToDto(replyList))
                 .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
 
-    }
-
-    public List<Image> getImages(Long postId) {
-        List<ImagePost> imagePosts = imagePostRepository.findAllByPostId(postId);
-
-        List<Image> images = new ArrayList<>();
-
-        if (!CollectionUtils.isNullOrEmpty(imagePosts)) {
-            images = imagePosts.stream().map(ImagePost::getImage).collect(Collectors.toList());
-
-        }
-        return images;
     }
 
     @Transactional
@@ -239,7 +225,7 @@ public class PostService {
         for (Post post : posts) {
             PostDto.Response response = PostDto.Response.builder()
                     .post(post)
-                    .images(getImages(post.getId()))
+                    .images(getImages(post.getImages()))
                     .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
             responseList.add(response);
         }
@@ -277,6 +263,16 @@ public class PostService {
             Image imageEntity = imageService.savePostImage(image);
             imagePostRepository.save(ImagePost.createImagePost(imageEntity, post));
         }
+    }
+
+    public List<Image> getImages(List<ImagePost> imagePosts) {
+
+        List<Image> images = new ArrayList<>();
+
+        if (!CollectionUtils.isNullOrEmpty(imagePosts)) {
+            images = imagePosts.stream().map(ImagePost::getImage).collect(Collectors.toList());
+        }
+        return images;
     }
 
     public User getUser(Long userId) {
