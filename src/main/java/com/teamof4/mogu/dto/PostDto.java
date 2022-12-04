@@ -3,8 +3,10 @@ package com.teamof4.mogu.dto;
 import com.teamof4.mogu.entity.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -121,6 +123,47 @@ public class PostDto {
             this.replyList = replies;
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();
+        }
+    }
+
+    @Getter
+    public static class LikedResponses {
+
+        private Long id;
+
+        private Integer categoryId;
+
+        private Long userId;
+
+        private Integer view;
+
+        private String title;
+
+        private String content;
+
+        private Boolean isDeleted;
+
+        private Integer memberCount;
+
+        private String preferredMethod;
+
+        private String region;
+
+        private Boolean isOpened;
+
+        private LocalDateTime startAt;
+
+        private LocalDateTime createdAt;
+
+        private LocalDateTime updatedAt;
+
+        public LikedResponses(Long id, Integer categoryId, Long userId, Integer view, String title, String content) {
+            this.id = id;
+            this.categoryId = categoryId;
+            this.userId = userId;
+            this.view = view;
+            this.title = title;
+            this.content = content;
         }
     }
 }

@@ -48,6 +48,9 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Reply> replies;
 
+    @OneToOne(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private ProjectStudy projectStudies;
+
     public void updatePost(String title, String content) {
         this.title = title;
         this.content = content;

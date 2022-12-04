@@ -3,6 +3,7 @@ package com.teamof4.mogu.controller;
 import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
+import com.teamof4.mogu.entity.Post;
 import com.teamof4.mogu.service.PostService;
 import com.teamof4.mogu.service.UserService;
 import io.swagger.annotations.Api;
@@ -12,12 +13,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static com.teamof4.mogu.constants.ResponseConstants.CREATED;
 import static com.teamof4.mogu.constants.ResponseConstants.OK;
@@ -31,7 +38,6 @@ import static com.teamof4.mogu.dto.UserDto.*;
 public class UserController {
 
     private final UserService userService;
-    private final PostService postService;
 
     @PostMapping("/create")
     @ApiOperation(value = "회원 등록")
@@ -43,10 +49,15 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation(value = "로그인한 유저 토큰 반환")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest requestDto) {
-        LoginResponse loginResponse = userService.login(requestDto);
+    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest requestDto) {
+        String token = userService.login(requestDto);
+        ResponseCookie responseCookie =
+                ResponseCookie.from("access-token", token)
+                        .path("/")
+                        .httpOnly(true)
+                        .build();
 
-        return ResponseEntity.ok(loginResponse);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
     }
 
     @GetMapping("/login/info")
@@ -114,10 +125,10 @@ public class UserController {
 
     @GetMapping("/mypage/post/like")
     @ApiOperation(value = "마이페이지 내가 좋아요 한 게시물 리스트")
-    public ResponseEntity<Page<PostDto.Response>> getMyPostsByLiked(
+    public ResponseEntity<Page<Post>> getMyPostsByLiked(
             @PageableDefault Pageable pageable,
             @AuthenticationPrincipal Long userId) {
-        Page<PostDto.Response> pageResponse = userService.getMyPostsByLiked(userId, pageable);
+        Page<Post> pageResponse = userService.getMyPostsByLiked(userId, pageable);
 
         return ResponseEntity.ok(pageResponse);
     }
