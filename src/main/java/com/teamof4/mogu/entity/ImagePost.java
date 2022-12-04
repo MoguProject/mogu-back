@@ -1,10 +1,9 @@
 package com.teamof4.mogu.entity;
 
-import com.teamof4.mogu.repository.ImagePostRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 
 @Entity
 @Getter
@@ -17,12 +16,11 @@ public class ImagePost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Valid
     @OneToOne
     @JoinColumn(name = "image_id")
     private Image image;
 
-    @Valid
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
