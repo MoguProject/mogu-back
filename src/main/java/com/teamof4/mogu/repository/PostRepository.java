@@ -16,12 +16,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p " +
             "WHERE p.category = :category " +
-            "ORDER BY p.createdAt DESC ")
+            "ORDER BY p.id DESC")
     Page<Post> findAll(Pageable pageable, Category category);
 
     @Query("SELECT p FROM Post p " +
             "WHERE p.category = :category " +
-            "ORDER BY size(p.likes) DESC, p.createdAt DESC ")
+            "ORDER BY size(p.likes) DESC, p.id DESC ")
     Page<Post> findAllLikesDesc(Pageable pageable, Category category);
 
 //    @Query("SELECT DISTINCT p FROM Post p " +
