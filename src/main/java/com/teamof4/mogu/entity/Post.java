@@ -1,6 +1,7 @@
 package com.teamof4.mogu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.teamof4.mogu.dto.PostDto;
 import lombok.*;
 import org.hibernate.annotations.Where;
 
@@ -8,6 +9,8 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.List;
+
+import static com.teamof4.mogu.dto.PostDto.*;
 
 @Entity
 @Getter
@@ -51,7 +54,7 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Reply> replies;
 
-    @OneToOne(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
     private ProjectStudy projectStudies;
 
     public void updatePost(String title, String content) {
@@ -67,4 +70,12 @@ public class Post extends BaseTimeEntity {
         this.view = view + 1;
     }
 
+    public LikedResponse toLikedResponse() {
+        return LikedResponse.builder()
+                .id(this.id)
+                .title(this.title)
+                .content(this.content)
+                .view(this.view)
+                .build();
+    }
 }

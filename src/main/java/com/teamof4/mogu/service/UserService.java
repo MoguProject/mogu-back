@@ -1,10 +1,10 @@
 package com.teamof4.mogu.service;
 
+import com.teamof4.mogu.constants.CategoryNames;
 import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.dto.UserDto.LoginRequest;
-import com.teamof4.mogu.dto.UserDto.LoginResponse;
 import com.teamof4.mogu.dto.UserDto.SaveRequest;
 import com.teamof4.mogu.entity.Post;
 import com.teamof4.mogu.entity.User;
@@ -17,17 +17,13 @@ import com.teamof4.mogu.util.certification.EmailService;
 import com.teamof4.mogu.util.encryption.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfInt;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.teamof4.mogu.constants.DefaultImageConstants.DEFAULT_PROFILE_IMAGE_ID;
 
@@ -47,7 +43,7 @@ public class UserService {
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public void save(SaveRequest requestDto) {
+    public void create(SaveRequest requestDto) {
         checkDuplicatedForCreate(requestDto);
 
         requestDto.encryptPassword(encryptionService);
@@ -96,6 +92,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
 
+        System.out.println("=========================================================================================================================================================================================================================");
         UserInfoResponse userInfoResponse = user.toUserInfoResponse();
 
         return userInfoResponse;
@@ -199,10 +196,25 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> getMyPostsByLiked(Long userId, Pageable pageable) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
-//        Page<Post> posts = postRepository.findAllByUserAndLiked(pageable, user);
-        return null;
+    public List<PostDto.LikedResponse> getMyLikedPosts(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+        List<Post> posts = postRepository.findPostsILiked(pageable, user);
+        System.out.println("posts.size() = " + posts.size());
+        posts.stream().forEach(post -> System.out.println("postId and post.getProjectStudies() = " + post.getId() + post.getProjectStudies()));
+        List<PostDto.LikedResponse> responses =
+                posts.stream().map(post -> post.toLikedResponse()).collect(Collectors.toList());
+
+        return responses;
+    }
+
+    public void getMyParticipatingPosts(Long userId, Pageable pageable, CategoryNames categoryName) {
+        if(categoryName.equals(CategoryNames.PROJECT)) {
+
+        }
+
+        if(categoryName.equals(CategoryNames.STUDY)) {
+
+        }
     }
 }

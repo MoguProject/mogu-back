@@ -127,7 +127,10 @@ public class PostDto {
     }
 
     @Getter
-    public static class LikedResponses {
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LikedResponse {
 
         private Long id;
 
@@ -157,7 +160,7 @@ public class PostDto {
 
         private LocalDateTime updatedAt;
 
-        public LikedResponses(Long id, Integer categoryId, Long userId, Integer view, String title, String content) {
+        public LikedResponse(Long id, Integer categoryId, Long userId, Integer view, String title, String content) {
             this.id = id;
             this.categoryId = categoryId;
             this.userId = userId;

@@ -21,6 +21,8 @@ import static com.teamof4.mogu.constants.RegexConstants.PHONE;
 public class UserDto {
 
     @Getter
+    @Builder
+    @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class SaveRequest {
 
