@@ -24,16 +24,29 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "ORDER BY size(p.likes) DESC, p.createdAt DESC ")
     Page<Post> findAllLikesDesc(Pageable pageable, Category category);
 
+    @Query("SELECT  DISTINCT p FROM Post p " +
+            "JOIN FETCH p.projectStudies " +
+            "JOIN FETCH p.user " +
+            "WHERE p.category = :category " +
+            "AND p.user = :user " +
+            "ORDER BY p.id DESC ")
+    List<Post> findMyPostsByUserAndCategory(Pageable pageable, User user, Category category);
+
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN FETCH p.projectStudies " +
             "JOIN FETCH p.user " +
+            "JOIN FETCH p.category " +
             "JOIN p.likes l " +
-            "WHERE l.user = :user "+
+            "WHERE l.user = :user " +
             "ORDER BY p.id DESC ")
     List<Post> findPostsILiked(Pageable pageable, User user);
 
     @Query("SELECT DISTINCT p FROM Post p " +
-            "JOIN FETCH p.projectStudies " +
-            " ")
-    List<Post> findAllProjectsByUser(Pageable pageable, Category category, Long userId);
+            "LEFT JOIN FETCH p.projectStudies " +
+            "JOIN FETCH p.user " +
+            "JOIN FETCH p.category " +
+            "JOIN p.replies r " +
+            "WHERE r.user = :user " +
+            "ORDER BY p.id DESC ")
+    List<Post> findPostsIReplied(Pageable pageable, User user);
 }

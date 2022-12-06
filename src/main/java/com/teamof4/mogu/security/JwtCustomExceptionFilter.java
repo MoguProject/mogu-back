@@ -1,9 +1,7 @@
 package com.teamof4.mogu.security;
 
 import com.teamof4.mogu.dto.JwtErrorResponseDto;
-import com.teamof4.mogu.exception.user.WrongTokenSignatureException;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

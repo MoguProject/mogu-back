@@ -3,6 +3,7 @@ package com.teamof4.mogu.entity;
 import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "image_id")
     private Image image;
 

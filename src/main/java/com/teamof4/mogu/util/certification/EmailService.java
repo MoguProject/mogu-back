@@ -5,7 +5,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import static com.teamof4.mogu.constants.EmailConstants.*;
