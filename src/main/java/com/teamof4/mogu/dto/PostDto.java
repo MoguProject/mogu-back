@@ -130,43 +130,23 @@ public class PostDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LikedResponse {
+    public static class MyPageResponse {
 
         private Long id;
 
-        private Integer categoryId;
-
-        private Long userId;
-
-        private Integer view;
+        private String categoryName;
 
         private String title;
 
-        private String content;
+        private String nickname;
 
-        private Boolean isDeleted;
+        private int likeCount;
 
-        private Integer memberCount;
+        private int view;
 
-        private String preferredMethod;
-
-        private String region;
-
-        private Boolean isOpened;
-
-        private LocalDateTime startAt;
+        private boolean isLiked;
 
         private LocalDateTime createdAt;
 
-        private LocalDateTime updatedAt;
-
-        public LikedResponse(Long id, Integer categoryId, Long userId, Integer view, String title, String content) {
-            this.id = id;
-            this.categoryId = categoryId;
-            this.userId = userId;
-            this.view = view;
-            this.title = title;
-            this.content = content;
-        }
     }
 }

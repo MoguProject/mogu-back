@@ -1,6 +1,5 @@
 package com.teamof4.mogu.security;
 
-import com.teamof4.mogu.constants.JwtConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

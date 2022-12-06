@@ -4,12 +4,12 @@ import com.teamof4.mogu.constants.CategoryNames;
 import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.*;
-import com.teamof4.mogu.dto.UserDto.LoginRequest;
-import com.teamof4.mogu.dto.UserDto.SaveRequest;
+import com.teamof4.mogu.entity.Category;
 import com.teamof4.mogu.entity.Post;
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.entity.UserSkill;
 import com.teamof4.mogu.exception.image.ImageNotFoundException;
+import com.teamof4.mogu.exception.post.CategoryNotFoundException;
 import com.teamof4.mogu.exception.user.*;
 import com.teamof4.mogu.repository.*;
 import com.teamof4.mogu.security.TokenProvider;
@@ -36,6 +36,9 @@ public class UserService {
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+
+    private final CategoryRepository categoryRepository;
+
     private final UserSkillRepository userSkillRepository;
     private final SkillRepository skillRepository;
     private final EncryptionService encryptionService;
@@ -196,25 +199,40 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto.LikedResponse> getMyLikedPosts(Long userId, Pageable pageable) {
+    public List<PostDto.MyPageResponse> getPostsILiked(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
         List<Post> posts = postRepository.findPostsILiked(pageable, user);
-        System.out.println("posts.size() = " + posts.size());
-        posts.stream().forEach(post -> System.out.println("postId and post.getProjectStudies() = " + post.getId() + post.getProjectStudies()));
-        List<PostDto.LikedResponse> responses =
-                posts.stream().map(post -> post.toLikedResponse()).collect(Collectors.toList());
+        List<PostDto.MyPageResponse> responses = posts.stream()
+                .map(post -> post.toMyPageResponse(user))
+                .collect(Collectors.toList());
 
         return responses;
     }
 
-    public void getMyParticipatingPosts(Long userId, Pageable pageable, CategoryNames categoryName) {
-        if(categoryName.equals(CategoryNames.PROJECT)) {
+    @Transactional(readOnly = true)
+    public List<PostDto.MyPageResponse> getPostsIReplied(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+        List<Post> posts = postRepository.findPostsIReplied(pageable, user);
+        List<PostDto.MyPageResponse> responses = posts.stream()
+                .map(post -> post.toMyPageResponse(user))
+                .collect(Collectors.toList());
 
-        }
+        return responses;
+    }
 
-        if(categoryName.equals(CategoryNames.STUDY)) {
+    @Transactional(readOnly = true)
+    public List<PostDto.MyPageResponse> getMyParticipatingPosts(Long userId, Pageable pageable, CategoryNames categoryName) {
+        Category category = categoryRepository.findByCategoryName(categoryName.getKorName())
+                .orElseThrow(() -> new CategoryNotFoundException("해당 카테고리가 존재하지 않습니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+        List<Post> posts = postRepository.findMyPostsByUserAndCategory(pageable, user, category);
+        List<PostDto.MyPageResponse> responses = posts.stream()
+                .map(post -> post.toMyPageResponse(user))
+                .collect(Collectors.toList());
 
-        }
+        return responses;
     }
 }

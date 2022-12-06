@@ -1,8 +1,8 @@
 package com.teamof4.mogu.controller;
 
 import com.teamof4.mogu.constants.CategoryNames;
-import com.teamof4.mogu.dto.PostDto.LikedResponse;
-import com.teamof4.mogu.dto.UserDto.SaveRequest;
+import com.teamof4.mogu.dto.PostDto.MyPageResponse;
+import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static com.teamof4.mogu.constants.ResponseConstants.CREATED;
@@ -126,28 +125,36 @@ public class UserController {
     }
 
     @GetMapping("/mypage/post/project")
-    @ApiOperation(value = "마이페이지 내가 참여중인 프로젝트")
+    @ApiOperation(value = "마이페이지 내가 모집중인 프로젝트")
     public ResponseEntity<List> getMyProjectPosts(@PageableDefault Pageable pageable, @AuthenticationPrincipal Long userId) {
-        userService.getMyParticipatingPosts(userId, pageable, CategoryNames.PROJECT);
+        List<MyPageResponse> response = userService.getMyParticipatingPosts(userId, pageable, CategoryNames.PROJECT);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/mypage/post/study")
-    @ApiOperation(value = "마이페이지 내가 참여중인 스터디")
-    public ResponseEntity<List> getMyStudyPosts(@PageableDefault Pageable pageable, @AuthenticationPrincipal Long userId) {
-        userService.getMyParticipatingPosts(userId, pageable, CategoryNames.STUDY);
+    @ApiOperation(value = "마이페이지 내가 모집중인 스터디")
+    public ResponseEntity<List<MyPageResponse>> getMyStudyPosts(@PageableDefault Pageable pageable, @AuthenticationPrincipal Long userId) {
+        List<MyPageResponse> response = userService.getMyParticipatingPosts(userId, pageable, CategoryNames.STUDY);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/mypage/post/like")
+    @GetMapping("/mypage/post/liked")
     @ApiOperation(value = "마이페이지 내가 좋아요 한 게시물 리스트")
-    public ResponseEntity<List<LikedResponse>> getMyLikedPosts(@PageableDefault Pageable pageable,
-                                                               @AuthenticationPrincipal Long userId) {
-        List<LikedResponse> pageResponse = userService.getMyLikedPosts(userId, pageable);
+    public ResponseEntity<List<MyPageResponse>> getPostsILiked(@PageableDefault Pageable pageable,
+                                                                @AuthenticationPrincipal Long userId) {
+        List<MyPageResponse> response = userService.getPostsILiked(userId, pageable);
 
-        return ResponseEntity.ok(pageResponse);
+        return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/mypage/post/replied")
+    @ApiOperation(value = "마이페이지 내가 댓글 단 게시물 리스트")
+    public ResponseEntity<List<MyPageResponse>> getPostsIReplied(@PageableDefault Pageable pageable,
+                                                                 @AuthenticationPrincipal Long userId) {
+        List<MyPageResponse> response = userService.getPostsIReplied(userId, pageable);
+
+        return ResponseEntity.ok(response);
+    }
 }

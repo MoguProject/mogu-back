@@ -2,6 +2,7 @@ package com.teamof4.mogu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -50,6 +51,7 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = LAZY)
     private List<ImagePost> images;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "post", fetch = LAZY, cascade = CascadeType.REMOVE)
     private List<Like> likes;
 
@@ -72,12 +74,16 @@ public class Post extends BaseTimeEntity {
         this.view = view + 1;
     }
 
-    public LikedResponse toLikedResponse() {
-        return LikedResponse.builder()
+    public MyPageResponse toMyPageResponse(User currentUser) {
+        return MyPageResponse.builder()
                 .id(this.id)
+                .categoryName(this.category.getCategoryName())
                 .title(this.title)
-                .content(this.content)
+                .nickname(this.user.getNickname())
                 .view(this.view)
+                .likeCount(this.getLikes().size())
+                .isLiked(this.getLikes().stream().anyMatch(like -> like.getUser().equals(currentUser)))
+                .createdAt(this.getCreatedAt())
                 .build();
     }
 }
