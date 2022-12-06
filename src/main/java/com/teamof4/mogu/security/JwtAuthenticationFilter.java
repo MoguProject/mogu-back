@@ -1,9 +1,6 @@
 package com.teamof4.mogu.security;
 
 import com.sun.istack.NotNull;
-import com.teamof4.mogu.constants.JwtConstants;
-import com.teamof4.mogu.exception.user.ExpiredTokenException;
-import com.teamof4.mogu.exception.user.WrongTokenSignatureException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -16,20 +13,16 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.teamof4.mogu.constants.JwtConstants.EXPIRED_TOKEN;
 
 @Slf4j
 @Component
