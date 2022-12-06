@@ -1,7 +1,6 @@
 package com.teamof4.mogu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.teamof4.mogu.dto.ProjectStudyDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,6 +8,9 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.teamof4.mogu.dto.ProjectStudyDto.*;
+import static javax.persistence.FetchType.*;
 
 @Entity
 @Getter
@@ -32,6 +34,10 @@ public class ProjectStudy {
 
     private String period;
 
+    private String contactMethod;
+
+    private String contactInfo;
+
     @Column(name = "is_opened")
     private boolean openStatus;
 
@@ -40,10 +46,10 @@ public class ProjectStudy {
     private LocalDate startAt;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "projectStudy", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "projectStudy", fetch = LAZY)
     private List<PostSkill> postSkills = new ArrayList<>();
 
-    public void updateProjectStudy(ProjectStudyDto.Request dto) {
+    public void updateProjectStudy(Request dto) {
         this.preferredMethod = dto.getPreferredMethod();
         this.region = dto.getRegion();
         this.period = dto.getPeriod();

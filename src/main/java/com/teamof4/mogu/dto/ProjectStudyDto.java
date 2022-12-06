@@ -38,6 +38,14 @@ public class ProjectStudyDto {
         @ApiParam(value = "기술 스택", required = true)
         private List<Skill> skills;
 
+        @NotEmpty(message = "연락 방법을 선택해 주세요.")
+        @ApiParam(value = "연락 방법", required = true)
+        private String contactMethod;
+
+        @NotEmpty(message = "연락처나 링크를 입력해 주세요.")
+        @ApiParam(value = "연락처 혹은 링크", required = true)
+        private String contactInfo;
+
         @NotNull(message = "시작 예정일을 선택해 주세요.")
         @ApiParam(value = "시작 예정일", required = true)
         private LocalDate startAt;
@@ -53,6 +61,8 @@ public class ProjectStudyDto {
                     .preferredMethod(preferredMethod)
                     .region(region)
                     .period(period)
+                    .contactMethod(contactMethod)
+                    .contactInfo(contactInfo)
                     .memberCount(memberCount)
                     .startAt(startAt).build();
         }
@@ -94,6 +104,12 @@ public class ProjectStudyDto {
 
         @ApiModelProperty(notes = "모집 인원")
         private int memberCount;
+
+        @ApiModelProperty(notes = "연락 방법")
+        private String contactMethod;
+
+        @ApiModelProperty(notes = "연락처 혹은 링크")
+        private String contactInfo;
 
         @ApiModelProperty(notes = "조회수")
         private int view;
@@ -139,6 +155,8 @@ public class ProjectStudyDto {
             this.region = projectStudy.getRegion();
             this.period = projectStudy.getPeriod();
             this.memberCount = projectStudy.getMemberCount();
+            this.contactMethod = projectStudy.getContactMethod();
+            this.contactInfo = projectStudy.getContactInfo();
             this.openStatus = projectStudy.isOpenStatus();
             this.postSkills = projectStudy.getPostSkills();
             this.imageList = images;

@@ -1,7 +1,6 @@
 package com.teamof4.mogu.service;
 
 import com.teamof4.mogu.constants.SortStatus;
-import com.teamof4.mogu.dto.PostDto;
 import com.teamof4.mogu.dto.ProjectStudyDto;
 import com.teamof4.mogu.entity.*;
 import com.teamof4.mogu.exception.post.ProjectStudyNotFoundException;
@@ -22,6 +21,8 @@ import java.util.stream.Collectors;
 
 import static com.teamof4.mogu.constants.SortStatus.ALL;
 import static com.teamof4.mogu.constants.SortStatus.OPENED;
+import static com.teamof4.mogu.dto.PostDto.*;
+import static com.teamof4.mogu.dto.ProjectStudyDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -94,8 +95,7 @@ public class ProjectStudyService {
     }
 
     @Transactional
-    public Long saveProjectStudy(PostDto.SaveRequest postDTO,
-                                 ProjectStudyDto.Request projectStudyDTO, Long currentUserId) {
+    public Long saveProjectStudy(SaveRequest postDTO, Request projectStudyDTO, Long currentUserId) {
 
         Long postId = postService.savePost(postDTO, currentUserId);
         Post post = postService.getPost(postId);
@@ -109,8 +109,8 @@ public class ProjectStudyService {
     }
 
     @Transactional
-    public Long updateProjectStudy(Long postId, PostDto.UpdateRequest postDTO,
-                                   ProjectStudyDto.Request projectStudyDTO) {
+    public Long updateProjectStudy(Long postId, UpdateRequest postDTO,
+                                   Request projectStudyDTO) {
 
         postService.updatePost(postId, postDTO);
 

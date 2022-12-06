@@ -1,7 +1,9 @@
 package com.teamof4.mogu.controller;
 
-import com.teamof4.mogu.dto.PostDto;
+import com.teamof4.mogu.dto.PostDto.SaveRequest;
+import com.teamof4.mogu.dto.PostDto.UpdateRequest;
 import com.teamof4.mogu.dto.ProjectStudyDto;
+import com.teamof4.mogu.dto.ProjectStudyDto.Request;
 import com.teamof4.mogu.service.ProjectStudyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -81,8 +83,8 @@ public class ProjectStudyController {
 
     @PostMapping("/create")
     @ApiOperation(value = "프로젝트/스터디 게시글 등록")
-    public ResponseEntity<Long> saveProjectStudy(@Valid PostDto.SaveRequest postDto,
-                                                 @Valid @RequestBody ProjectStudyDto.Request projectStudyDto,
+    public ResponseEntity<Long> saveProjectStudy(@Valid SaveRequest postDto,
+                                                 @Valid @RequestPart Request projectStudyDto,
                                                  @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(projectStudyService.saveProjectStudy(postDto, projectStudyDto, userId));
     }
@@ -90,8 +92,8 @@ public class ProjectStudyController {
     @PostMapping("/update/{postId}")
     @ApiOperation(value = "프로젝트/스터디 게시글 수정")
     public ResponseEntity<Long> updatePost(@PathVariable Long postId,
-                                           @Valid PostDto.UpdateRequest postDto,
-                                           @Valid @RequestBody ProjectStudyDto.Request projectStudyDto) {
+                                           @Valid UpdateRequest postDto,
+                                           @Valid @RequestPart Request projectStudyDto) {
         return ResponseEntity.ok(projectStudyService.updateProjectStudy(postId, postDto, projectStudyDto));
     }
 }
