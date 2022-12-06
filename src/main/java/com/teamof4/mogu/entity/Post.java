@@ -1,7 +1,6 @@
 package com.teamof4.mogu.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.teamof4.mogu.dto.PostDto;
 import lombok.*;
 import org.hibernate.annotations.Where;
 
@@ -10,7 +9,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+import static javax.persistence.CascadeType.REMOVE;
+
 import static com.teamof4.mogu.dto.PostDto.*;
+import static javax.persistence.FetchType.*;
 
 @Entity
 @Getter
@@ -26,13 +28,13 @@ public class Post extends BaseTimeEntity {
 
     @Valid
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Valid
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
@@ -45,16 +47,16 @@ public class Post extends BaseTimeEntity {
 
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = LAZY)
     private List<ImagePost> images;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "post", fetch = LAZY, cascade = CascadeType.REMOVE)
     private List<Like> likes;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "post", fetch = LAZY, cascade = CascadeType.REMOVE)
     private List<Reply> replies;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "post", cascade = REMOVE)
     private ProjectStudy projectStudies;
 
     public void updatePost(String title, String content) {

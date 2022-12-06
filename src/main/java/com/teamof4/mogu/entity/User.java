@@ -1,6 +1,5 @@
 package com.teamof4.mogu.entity;
 
-import com.teamof4.mogu.dto.UserDto;
 import com.teamof4.mogu.dto.UserDto.*;
 import lombok.*;
 
