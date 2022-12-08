@@ -35,10 +35,10 @@ public class PostController {
      * 위의 카테고리 아이디로 조회할 때만 사용한다.
      */
     @GetMapping("/list/{categoryId}")
-    @ApiOperation(value = "커뮤니티 게시글 전체 조회(생성일 기준)", notes = "카테고리 별, 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "커뮤니티 게시글 전체 조회(id 기준)", notes = "카테고리 별, id 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<PostDto.Response>> getPostList(@PathVariable Long categoryId,
                                                               @AuthenticationPrincipal Long userId,
-             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(postService.getPostList(categoryId, pageable, userId, DEFAULT));
     }
 
@@ -95,6 +95,10 @@ public class PostController {
     @ApiOperation(value = "최상위 댓글 등록")
     public ResponseEntity<Long> saveSuperReply(@Valid @RequestBody SuperRequest dto,
                                                @AuthenticationPrincipal Long userId) {
+        if (userId == null) {
+            throw new UserNotLoginedException();
+        }
+
         return ResponseEntity.ok(postService.saveSuperReply(userId, dto));
     }
 
@@ -102,6 +106,9 @@ public class PostController {
     @ApiOperation(value = "하위 댓글 등록")
     public ResponseEntity<Long> saveSubReply(@Valid @RequestBody Request dto,
                                                @AuthenticationPrincipal Long userId) {
+        if (userId == null) {
+            throw new UserNotLoginedException();
+        }
         return ResponseEntity.ok(postService.saveSubReply(userId, dto));
     }
 
