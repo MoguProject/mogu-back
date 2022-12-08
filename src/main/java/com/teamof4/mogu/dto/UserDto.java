@@ -2,17 +2,11 @@ package com.teamof4.mogu.dto;
 
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.util.encryption.EncryptionService;
-import io.swagger.annotations.Api;
-import lombok.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.*;
-
 import java.util.List;
 
 import static com.teamof4.mogu.constants.RegexConstants.PASSWORD;
@@ -74,6 +68,7 @@ public class UserDto {
         }
     }
 
+    @Builder
     @Getter
     public static class LoginRequest {
 
@@ -186,6 +181,8 @@ public class UserDto {
     }
 
     @Getter
+    @Builder
+    @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UpdatePasswordRequest {
         @ApiParam(value = "기존 회원 비밀번호")
@@ -213,7 +210,10 @@ public class UserDto {
         }
     }
 
+    @Builder
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DeleteRequest {
         @ApiParam(value = "회원 비밀번호")
         @NotBlank(message = "비밀번호를 입력해주세요")
@@ -225,6 +225,9 @@ public class UserDto {
     }
 
     @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class EmailCertificationRequest {
         @ApiParam(value = "회원 메일 주소")
         @NotBlank(message = "이메일 주소를 입력해주세요")
@@ -232,6 +235,7 @@ public class UserDto {
     }
 
     @Getter
+    @Builder
     public static class CreatePasswordRequest {
         @ApiParam(value = "가입한 이메일 주소")
         @NotBlank(message = "이메일 주소를 입력해주세요")

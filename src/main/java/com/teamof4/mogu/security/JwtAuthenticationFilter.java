@@ -1,11 +1,13 @@
 package com.teamof4.mogu.security;
 
 import com.sun.istack.NotNull;
+import com.teamof4.mogu.dto.JwtErrorResponseDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -51,21 +53,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authenticationToken);
                 SecurityContextHolder.setContext(securityContext);
+                filterChain.doFilter(request, response);
             }
         } catch (ExpiredJwtException exception) {
             log.warn("토큰 기한 만료");
-            throw new JwtException("만료된 토큰입니다.");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(JwtErrorResponseDto
+                    .of(HttpStatus.UNAUTHORIZED, "token-expired", exception.getMessage()).convertToJson());
         } catch (SignatureException exception) {
             log.warn("토큰 서명 불일치");
-            request.setAttribute("exception", "만료토큰 777");
-            response.getWriter().write("만료토큰 123");
-            throw new JwtException("서명이 일치하지 않는 토큰입니다.");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(JwtErrorResponseDto
+                    .of(HttpStatus.UNAUTHORIZED, "token-signature-mismatch", exception.getMessage()).convertToJson());
         }
-        catch (Exception exception) {
-            logger.error("Could not set user authentication in security context", exception);
-            log.info("토큰 에러");
+        catch (JwtException exception) {
+            log.warn("토큰 이상");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(JwtErrorResponseDto
+                    .of(HttpStatus.UNAUTHORIZED, "token-modified", exception.getMessage()).convertToJson());
         }
-        filterChain.doFilter(request, response);
     }
 
     private String parsBearerToken(HttpServletRequest httpServletRequest) {
