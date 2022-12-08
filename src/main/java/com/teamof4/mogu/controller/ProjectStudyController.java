@@ -4,6 +4,7 @@ import com.teamof4.mogu.dto.PostDto.SaveRequest;
 import com.teamof4.mogu.dto.PostDto.UpdateRequest;
 import com.teamof4.mogu.dto.ProjectStudyDto;
 import com.teamof4.mogu.dto.ProjectStudyDto.Request;
+import com.teamof4.mogu.exception.user.UserNotLoginedException;
 import com.teamof4.mogu.service.ProjectStudyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,7 +68,7 @@ public class ProjectStudyController {
     }
 
     @GetMapping("/list/likes/{categoryId}")
-    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(조회 순)", notes = "카테고리 별 / 조회 순 / 생성일 기준 내림차 순으로 출력한다.")
+    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(좋아요 순)", notes = "카테고리 별 / 좋아요 순 / 생성일 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<ProjectStudyDto.Response>> getLikesProjectStudyList(@PathVariable Long categoryId,
                                                                          @AuthenticationPrincipal Long userId,
                                                                          @PageableDefault Pageable pageable) {
@@ -86,6 +87,10 @@ public class ProjectStudyController {
     public ResponseEntity<Long> saveProjectStudy(@Valid SaveRequest postDto,
                                                  @Valid @RequestPart Request projectStudyDto,
                                                  @AuthenticationPrincipal Long userId) {
+        if (userId == null) {
+            throw new UserNotLoginedException();
+        }
+
         return ResponseEntity.ok(projectStudyService.saveProjectStudy(postDto, projectStudyDto, userId));
     }
 
