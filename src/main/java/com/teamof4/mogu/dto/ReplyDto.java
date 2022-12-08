@@ -6,27 +6,35 @@ import io.swagger.annotations.ApiParam;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class ReplyDto {
 
     @Getter
+    @Builder
     public static class Request {
 
+        @NotNull
         @ApiParam(value = "댓글 ID", required = true)
         private Long replyId;
 
+        @NotBlank
         @ApiParam(value = "댓글 내용", required = true)
         private String content;
     }
 
     @Getter
+    @Builder
     public static class SuperRequest {
 
+        @NotNull
         @ApiParam(value = "게시글 ID", required = true)
         private Long postId;
 
+        @NotBlank
         @ApiParam(value = "댓글 내용", required = true)
         private String content;
     }

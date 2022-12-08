@@ -2,7 +2,6 @@ package com.teamof4.mogu.dto;
 
 import com.teamof4.mogu.entity.User;
 import com.teamof4.mogu.util.encryption.EncryptionService;
-import io.swagger.annotations.Api;
 import lombok.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
