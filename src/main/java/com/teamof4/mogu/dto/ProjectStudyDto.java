@@ -3,6 +3,7 @@ package com.teamof4.mogu.dto;
 import com.teamof4.mogu.entity.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class ProjectStudyDto {
 
     @Getter
+    @AllArgsConstructor
     public static class Request {
 
         @NotBlank(message = "진행 방식을 선택해 주세요.")
