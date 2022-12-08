@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.*;
 
 import javax.validation.constraints.*;
+
 import java.util.List;
 
 import static com.teamof4.mogu.constants.RegexConstants.PASSWORD;
