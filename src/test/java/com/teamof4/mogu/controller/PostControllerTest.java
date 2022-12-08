@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 
 
 import static com.teamof4.mogu.constants.SortStatus.DEFAULT;
+import static com.teamof4.mogu.constants.SortStatus.LIKES;
 import static com.teamof4.mogu.dto.PostDto.*;
 import static com.teamof4.mogu.dto.PostDto.Response;
 import static com.teamof4.mogu.dto.ReplyDto.*;
@@ -63,7 +64,7 @@ class PostControllerTest {
 
     @Nested
     @DisplayName("커뮤니티 게시글 조회")
-    class selectPosts {
+    class selectPostsTest {
 
         @Test
         @WithMockCustomUser
@@ -86,8 +87,27 @@ class PostControllerTest {
 
         @Test
         @WithMockCustomUser
+        @DisplayName("[성공] 커뮤니티 게시글 전체 조회(좋아요 순)")
+        void selectLikeDescPostList() throws Exception {
+
+            Pageable pageable = PageRequest.of(0, 10);
+
+            Page<Response> posts = postService.getPostList(1L, pageable, 1L, LIKES);
+
+            doReturn(posts).when(postService).getPostList(anyLong(), eq(pageable), anyLong(), any(SortStatus.class));
+
+            mockMvc.perform(
+                            get("/posts/list/likes/1")
+                                    .param("page", "0")
+                                    .param("size", "10"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockCustomUser
         @DisplayName("[성공] 커뮤니티 게시글 상세 조회")
-        void getDetails() throws Exception {
+        void selectPost() throws Exception {
 
             PostDto.Response response = postService.getPostDetails(1L, 1L);
 
@@ -102,31 +122,21 @@ class PostControllerTest {
 
     @Nested
     @DisplayName("커뮤니티 게시글 등록")
-    class saveTest {
+    class savePostTest {
 
         @Test
         @WithMockCustomUser
         @DisplayName("[성공] 이미지가 있을 때")
-        void savePostTestWithImages_Success() throws Exception {
-            String fileType = "image/jpeg";
-            String fileName = "multipartFiles";
-
-            MockMultipartFile multipartFile1 = new MockMultipartFile(
-                    fileName, "filename-1.jpeg",
-                    fileType, fileName.getBytes());
-
-            MockMultipartFile multipartFile2 = new MockMultipartFile(
-                    fileName, "filename-1.jpeg",
-                    fileType, fileName.getBytes());
+        void savePostWithImages_Success() throws Exception {
 
             doReturn(1L).when(postService).savePost(any(SaveRequest.class), anyLong());
 
             mockMvc.perform(
                             multipart("/posts/create")
-                                    .file(multipartFile1).file(multipartFile2)
+                                    .file(getMultipartFile()).file(getMultipartFile())
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("categoryId", "1")
                                     .param("title", "제목입니다.")
                                     .param("content", "내용입니다."))
@@ -138,7 +148,7 @@ class PostControllerTest {
         @Test
         @WithMockCustomUser
         @DisplayName("[성공] 이미지가 없을 때")
-        void savePostTestWithoutImages_Success() throws Exception {
+        void savePostWithoutImages_Success() throws Exception {
             SaveRequest saveRequest = SaveRequest.builder()
                     .categoryId(1L)
                     .title("제목입니다.")
@@ -150,7 +160,7 @@ class PostControllerTest {
                             multipart("/posts/create")
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("categoryId", "1")
                                     .param("title", "제목입니다.")
                                     .param("content", "내용입니다."))
@@ -173,14 +183,13 @@ class PostControllerTest {
                             multipart("/posts/create")
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("title", "제목입니다.")
                                     .param("content", "내용입니다."))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
 
         }
-
 
         @Test
         @DisplayName("[실패] 로그인한 유저가 없을 때")
@@ -193,7 +202,7 @@ class PostControllerTest {
                                     .file(getMultipartFile()).file(getMultipartFile())
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("categoryId", "1")
                                     .param("title", "제목입니다.")
                                     .param("content", "내용입니다."))
@@ -205,7 +214,7 @@ class PostControllerTest {
 
     @Nested
     @DisplayName("커뮤니티 게시글 수정")
-    class updatePost {
+    class updatePostTest {
 
         @Test
         @DisplayName("[성공] 이미지가 있을 때")
@@ -217,7 +226,7 @@ class PostControllerTest {
                             multipart("/posts/update/1")
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("title", "업데이트 제목입니다.")
                                     .param("content", "업데이트 내용입니다."))
                     .andDo(print())
@@ -238,7 +247,7 @@ class PostControllerTest {
                                     .file(getMultipartFile())
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("title", "업데이트 제목입니다.")
                                     .param("content", "업데이트 내용입니다."))
                     .andDo(print())
@@ -257,7 +266,7 @@ class PostControllerTest {
                             multipart("/posts/update/1")
                                     .contentType(MediaType.MULTIPART_FORM_DATA)
                                     .accept(MediaType.ALL)
-                                    .characterEncoding("UTF-8")
+                                    .characterEncoding(StandardCharsets.UTF_8)
                                     .param("content", "업데이트 내용입니다."))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
@@ -266,7 +275,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("커뮤니티 게시글 삭제")
-    void deletePost() throws Exception {
+    void deletePostTest() throws Exception {
 
         doNothing().when(postService).deletePost(anyLong());
 
@@ -415,7 +424,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("댓글 수정 기능")
-    void updateReply() throws Exception {
+    void updateReplyTest() throws Exception {
         Request request = Request.builder()
                 .replyId(1L)
                 .content("업데이트 내용입니다.").build();
@@ -433,7 +442,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("댓글 삭제 기능")
-    void deleteReply() throws Exception {
+    void deleteReplyTest() throws Exception {
 
         doNothing().when(postService).deleteReply(anyLong());
 
