@@ -3,7 +3,6 @@ package com.teamof4.mogu.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @Builder

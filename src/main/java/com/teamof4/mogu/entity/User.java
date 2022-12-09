@@ -1,8 +1,9 @@
 package com.teamof4.mogu.entity;
 
-import com.teamof4.mogu.dto.UserDto.*;
+import com.teamof4.mogu.dto.UserDto.LoginInfoResponse;
+import com.teamof4.mogu.dto.UserDto.UpdateRequest;
+import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
 import lombok.*;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;

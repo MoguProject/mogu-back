@@ -1,8 +1,6 @@
 package com.teamof4.mogu.config;
 
-import com.teamof4.mogu.security.JwtAuthenticationEntryPoint;
 import com.teamof4.mogu.security.JwtAuthenticationFilter;
-import com.teamof4.mogu.security.JwtCustomExceptionFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +15,10 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig {
 
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtCustomExceptionFilter jwtCustomExceptionFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,12 +32,10 @@ public class WebSecurityConfig {
                 .logout().disable()
                 .cors()
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.addFilterBefore(jwtCustomExceptionFilter, CorsFilter.class);
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
+
         return http.build();
     }
 

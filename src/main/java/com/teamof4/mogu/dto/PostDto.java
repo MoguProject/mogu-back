@@ -1,6 +1,9 @@
 package com.teamof4.mogu.dto;
 
-import com.teamof4.mogu.entity.*;
+import com.teamof4.mogu.entity.Category;
+import com.teamof4.mogu.entity.Image;
+import com.teamof4.mogu.entity.Post;
+import com.teamof4.mogu.entity.User;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
@@ -132,21 +135,28 @@ public class PostDto {
     @AllArgsConstructor
     public static class MyPageResponse {
 
+        @ApiModelProperty(notes = "게시물 ID")
         private Long id;
 
+        @ApiModelProperty(notes = "카테고리명")
         private String categoryName;
 
+        @ApiModelProperty(notes = "제목")
         private String title;
 
+        @ApiModelProperty(notes = "작성자 닉네임")
         private String nickname;
 
+        @ApiModelProperty(notes = "좋아요 수")
         private int likeCount;
 
+        @ApiModelProperty(notes = "조회수")
         private int view;
 
+        @ApiModelProperty(notes = "나의 좋아요 여부")
         private boolean isLiked;
 
+        @ApiModelProperty(notes = "작성일자")
         private LocalDateTime createdAt;
-
     }
 }

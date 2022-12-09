@@ -36,9 +36,7 @@ public class UserService {
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-
     private final CategoryRepository categoryRepository;
-
     private final UserSkillRepository userSkillRepository;
     private final SkillRepository skillRepository;
     private final EncryptionService encryptionService;
@@ -48,12 +46,12 @@ public class UserService {
     @Transactional
     public void create(SaveRequest requestDto) {
         checkDuplicatedForCreate(requestDto);
-
         requestDto.encryptPassword(encryptionService);
+
         User user = requestDto.toEntity();
+
         user.setImage(imageRepository.findById(DEFAULT_PROFILE_IMAGE_ID)
                 .orElseThrow(() -> new ImageNotFoundException("기본 프로필 이미지를 찾지 못했습니다.")));
-
         userRepository.save(user);
     }
 
@@ -63,11 +61,9 @@ public class UserService {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
             throw new DuplicatedEmailException();
         }
-
         if (userRepository.existsByNickname(requestDto.getNickname())) {
             throw new DuplicatedNicknameException();
         }
-
         if (userRepository.existsByPhone(requestDto.getPhone())) {
             throw new DuplicatedPhoneException();
         }
@@ -81,10 +77,10 @@ public class UserService {
         if (user.getIsDeleted()) {
             throw new UserNotFoundException("탈퇴한 회원입니다.");
         }
-
         if (!loginRequest.checkPassword(encryptionService, user.getPassword())) {
             throw new UserNotFoundException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
+
         String token = tokenProvider.create(user);
 
         return token;
@@ -94,8 +90,6 @@ public class UserService {
     public UserInfoResponse getMyPageInformation(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
-
-        System.out.println("=========================================================================================================================================================================================================================");
         UserInfoResponse userInfoResponse = user.toUserInfoResponse();
 
         return userInfoResponse;
@@ -105,7 +99,6 @@ public class UserService {
     public LoginInfoResponse getLoginInformation(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
-
         LoginInfoResponse loginInfoResponse = user.toLoginInfoResponse();
 
         return loginInfoResponse;
@@ -143,6 +136,7 @@ public class UserService {
     public void updateSkills(User user, UpdateRequest updateRequest) {
         List<UserSkill> originalUserSkills = user.getUserSkills();
         List<String> updatingSkillNames = updateRequest.getSkills();
+
         originalUserSkills
                 .stream()
                 .filter(original -> updatingSkillNames.stream().noneMatch(updating -> original.getSkill().getSkillName().equals(updating)))
@@ -162,7 +156,6 @@ public class UserService {
         if (!requestDto.checkPassword(encryptionService, user.getPassword())) {
             throw new WrongPasswordException();
         }
-
         user.deleteUser();
         userRepository.save(user);
         imageService.deleteProfileImage(user.getImage());
@@ -172,8 +165,7 @@ public class UserService {
         return emailService.sendCertificationEmail(requestDto.getEmail());
     }
 
-    public void updatePassword(UpdatePasswordRequest updatePasswordRequest,
-                               Long userId) {
+    public void updatePassword(UpdatePasswordRequest updatePasswordRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
 
@@ -183,7 +175,6 @@ public class UserService {
         if (updatePasswordRequest.isAlreadyMyPassword()) {
             throw new AlreadyMyPasswordException();
         }
-
         updatePasswordRequest.encryptPassword(encryptionService);
         user.updatePassword(updatePasswordRequest.getNewPassword());
         userRepository.save(user);
@@ -194,6 +185,7 @@ public class UserService {
         User user = userRepository.findByEmailAndName(requestDto.getEmail(), requestDto.getName())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
         String newPassword = emailService.sendNewPasswordEmail(requestDto.getEmail());
+
         user.updatePassword(UserDto.encryptPassword(encryptionService, newPassword));
         userRepository.save(user);
     }
@@ -203,7 +195,8 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
         List<Post> posts = postRepository.findPostsILiked(pageable, user);
-        List<PostDto.MyPageResponse> responses = posts.stream()
+        List<PostDto.MyPageResponse> responses = posts
+                .stream()
                 .map(post -> post.toMyPageResponse(user))
                 .collect(Collectors.toList());
 
@@ -229,7 +222,8 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
         List<Post> posts = postRepository.findMyPostsByUserAndCategory(pageable, user, category);
-        List<PostDto.MyPageResponse> responses = posts.stream()
+        List<PostDto.MyPageResponse> responses = posts
+                .stream()
                 .map(post -> post.toMyPageResponse(user))
                 .collect(Collectors.toList());
 

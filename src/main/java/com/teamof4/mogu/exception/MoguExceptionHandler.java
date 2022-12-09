@@ -50,21 +50,21 @@ public class MoguExceptionHandler {
     @ExceptionHandler(WrongPasswordException.class)
     public final ResponseEntity<String> handleWrongPasswordException(
             WrongPasswordException exception) {
-        log.debug("잘못된 비밀번호입니다.");
+        log.debug("잘못된 비밀번호입니다.", exception);
         return WRONG_PASSWORD;
     }
 
     @ExceptionHandler(AlreadyMyPasswordException.class)
     public final ResponseEntity<String> handleAlreadyMyPasswordException(
             AlreadyMyPasswordException exception) {
-        log.debug("이미 내가 사용중인 비밀번호입니다.");
+        log.debug("이미 내가 사용중인 비밀번호입니다.", exception);
         return ALREADY_MY_PASSWORD;
     }
 
     @ExceptionHandler(UserSkillNotFoundException.class)
     public final ResponseEntity<String> handleUserSkillNotFoundException(
             UserSkillNotFoundException exception) {
-        log.debug("해당 유저의 해당 기술스택을 찾을 수 없습니다.");
+        log.debug("해당 유저의 해당 기술스택을 찾을 수 없습니다.", exception);
         return USERSKILL_NOT_FOUND;
     }
 

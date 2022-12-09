@@ -12,14 +12,17 @@ public class JwtErrorResponseDto {
 
     private String error;
 
-    public static JwtErrorResponseDto of(HttpStatus status, String error) {
+    private String description;
+
+    public static JwtErrorResponseDto of(HttpStatus status, String error, String description) {
         return JwtErrorResponseDto.builder()
                 .status(status)
                 .error(error)
+                .description(description)
                 .build();
     }
 
     public String convertToJson() {
-        return "{\"status\":\""+this.status+"\",\"error\":\""+error+"\"}";
+        return "{\"status\":\""+this.status+"\",\n\"error\":\""+this.error+"\",\n\"description\":\""+this.description+"\"}";
     }
 }
