@@ -71,7 +71,6 @@ public class UserController {
     @ApiOperation(value = "로그인 정보 반환")
     public ResponseEntity<LoginInfoResponse> getLoginInformation(@AuthenticationPrincipal Long userId) {
         LoginInfoResponse loginInfoResponse = userService.getLoginInformation(userId);
-        log.warn("Controller");
 
         return ResponseEntity.ok(loginInfoResponse);
     }
