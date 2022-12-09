@@ -39,7 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
 @MockBean(JpaMetamodelMappingContext.class)
-@ActiveProfiles("local")
 @AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
 

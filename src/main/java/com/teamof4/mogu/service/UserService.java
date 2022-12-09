@@ -145,7 +145,8 @@ public class UserService {
                 .stream()
                 .filter(updating -> user.getUserSkillNames().stream().noneMatch(original -> updating.equals(original)))
                 .map(skillName -> skillRepository.findBySkillName(skillName))
-                .forEach(skill -> userSkillRepository.save(UserSkill.of(user, skill.orElseThrow(() -> new UserSkillNotFoundException()))));
+                .forEach(skill -> userSkillRepository.save(
+                        UserSkill.of(user, skill.orElseThrow(() -> new UserSkillNotFoundException()))));
     }
 
     @Transactional
