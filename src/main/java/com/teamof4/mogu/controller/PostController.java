@@ -59,7 +59,7 @@ public class PostController {
 
     @PostMapping("/create")
     @ApiOperation(value = "커뮤니티 게시글 등록")
-    public ResponseEntity<Long> savePost(@Valid SaveRequest dto,
+    public ResponseEntity<Long> savePost(@Valid @RequestBody SaveRequest dto,
                                          @AuthenticationPrincipal Long userId) {
         if (userId == null) {
             throw new UserNotLoginedException();
@@ -69,14 +69,16 @@ public class PostController {
 
     @PostMapping("/update/{postId}")
     @ApiOperation(value = "커뮤니티 게시글 수정")
-    public ResponseEntity<Long> updatePost(@PathVariable Long postId, @Valid UpdateRequest dto) {
-        return ResponseEntity.ok(postService.updatePost(postId, dto));
+    public ResponseEntity<Long> updatePost(@PathVariable Long postId,
+                                           @Valid @RequestBody UpdateRequest dto,
+                                           @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(postService.updatePost(postId, dto, userId));
     }
 
     @PostMapping("/delete/{postId}")
     @ApiOperation(value = "커뮤니티 게시글 삭제")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @AuthenticationPrincipal Long userId) {
+        postService.deletePost(postId, userId);
         return ResponseEntity.ok().build();
     }
 
@@ -114,14 +116,14 @@ public class PostController {
 
     @PostMapping("/reply/update")
     @ApiOperation(value = "댓글 수정")
-    public ResponseEntity<Long> updateReply(@Valid @RequestBody Request dto) {
-        return ResponseEntity.ok(postService.updateReply(dto));
+    public ResponseEntity<Long> updateReply(@Valid @RequestBody Request dto, @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(postService.updateReply(dto, userId));
     }
 
     @PostMapping("/reply/delete/{replyId}")
     @ApiOperation(value = "댓글 삭제")
-    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId) {
-        postService.deleteReply(replyId);
+    public ResponseEntity<Void> deleteReply(@PathVariable Long replyId, @AuthenticationPrincipal Long userId) {
+        postService.deleteReply(replyId, userId);
         return ResponseEntity.ok().build();
     }
 }

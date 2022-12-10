@@ -1,6 +1,5 @@
 package com.teamof4.mogu.service;
 
-import com.amazonaws.util.CollectionUtils;
 import com.teamof4.mogu.constants.SortStatus;
 import com.teamof4.mogu.dto.LikeDto;
 import com.teamof4.mogu.dto.PostDto;
@@ -10,6 +9,7 @@ import com.teamof4.mogu.exception.post.LikeNotFoundException;
 import com.teamof4.mogu.exception.post.PostNotFoundException;
 import com.teamof4.mogu.exception.post.ReplyNotFoundException;
 import com.teamof4.mogu.exception.user.UserNotFoundException;
+import com.teamof4.mogu.exception.user.UserNotMatchException;
 import com.teamof4.mogu.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,10 +36,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final ImagePostRepository imagePostRepository;
     private final LikeRepository likeRepository;
     private final ReplyRepository replyRepository;
-    private final ImageService imageService;
 
     public Page<PostDto.Response> getPostList(Long categoryId, Pageable pageable,
                                               Long currentUserId, SortStatus status) {
@@ -72,7 +69,6 @@ public class PostService {
 
         return PostDto.Response.builder()
                 .post(post)
-                .images(getImages(post.getImages()))
                 .replies(replyConvertToDto(replyList))
                 .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
 
@@ -85,25 +81,21 @@ public class PostService {
 
         postRepository.save(post);
 
-        if (!CollectionUtils.isNullOrEmpty(requestDTO.getMultipartFiles())) {
-            saveImage(requestDTO.getMultipartFiles(), post);
-        }
-
         return post.getId();
 
     }
 
     @Transactional
-    public Long updatePost(Long postId, PostDto.UpdateRequest requestDTO) {
+    public Long updatePost(Long postId, PostDto.UpdateRequest requestDTO, Long currentUserId) {
 
         Post post = getPost(postId);
+
+        User user = getUser(currentUserId);
+        if (user != post.getUser()) {
+            throw new UserNotMatchException("본인이 작성한 글만 수정할 수 있습니다.");
+        }
+
         post.updatePost(requestDTO.getTitle(), requestDTO.getContent());
-
-        List<ImagePost> imagePosts = imagePostRepository.findAllByPostId(postId);
-
-        List<MultipartFile> multipartFiles = requestDTO.getMultipartFiles();
-
-        updatePostImageProcess(post, multipartFiles, imagePosts);
 
         postRepository.save(post);
 
@@ -111,8 +103,14 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, Long currentUserId) {
         Post post = getPost(postId);
+
+        User user = getUser(currentUserId);
+        if (user != post.getUser()) {
+            throw new UserNotMatchException("본인이 작성한 글만 삭제할 수 있습니다.");
+        }
+
         post.changeStatus();
 
         postRepository.save(post);
@@ -165,8 +163,14 @@ public class PostService {
         return reply.getId();
     }
 
-    public Long updateReply(Request dto) {
+    public Long updateReply(Request dto, Long currentUserId) {
         Reply reply = getReply(dto.getReplyId());
+
+        User user = getUser(currentUserId);
+        if (user != reply.getUser()) {
+            throw new UserNotMatchException("본인이 작성한 댓글만 수정할 수 있습니다.");
+        }
+
         reply.updateReply(dto.getContent());
 
         replyRepository.save(reply);
@@ -174,10 +178,15 @@ public class PostService {
         return reply.getId();
     }
 
-    public void deleteReply(Long replyId) {
+    public void 정deleteReply(Long replyId, Long currentUserId) {
         Reply reply = getReply(replyId);
-        reply.deleteReply();
 
+        User user = getUser(currentUserId);
+        if (user != reply.getUser()) {
+            throw new UserNotMatchException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
+
+        reply.changeDeleteStatus();
         replyRepository.save(reply);
     }
 
@@ -195,37 +204,12 @@ public class PostService {
         return isLiked;
     }
 
-    private void updatePostImageProcess(Post post, List<MultipartFile> multipartFiles, List<ImagePost> imagePosts) {
-
-        if (CollectionUtils.isNullOrEmpty(imagePosts)) {
-            if (!CollectionUtils.isNullOrEmpty(multipartFiles)) {
-                saveImage(multipartFiles, post);
-            }
-        } else {
-
-            for (ImagePost imagePost : imagePosts) {
-                imagePostRepository.deleteById(imagePost.getId());
-            }
-
-            List<Image> images = imagePosts.stream().map(ImagePost::getImage).collect(Collectors.toList());
-
-            for (Image image : images) {
-                imageService.deleteImage(image);
-            }
-
-            if (!CollectionUtils.isNullOrEmpty(multipartFiles)) {
-                saveImage(multipartFiles, post);
-            }
-        }
-    }
-
     private List<PostDto.Response> getResponses(Page<Post> posts, Long currentUserId) {
         List<PostDto.Response> responseList = new ArrayList<>();
 
         for (Post post : posts) {
             PostDto.Response response = PostDto.Response.builder()
                     .post(post)
-                    .images(getImages(post.getImages()))
                     .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
             responseList.add(response);
         }
@@ -254,25 +238,6 @@ public class PostService {
         }
 
         return responseList;
-    }
-
-
-    @Transactional
-    public void saveImage(List<MultipartFile> images, Post post) {
-        for (MultipartFile image : images) {
-            Image imageEntity = imageService.savePostImage(image);
-            imagePostRepository.save(ImagePost.createImagePost(imageEntity, post));
-        }
-    }
-
-    public List<Image> getImages(List<ImagePost> imagePosts) {
-
-        List<Image> images = new ArrayList<>();
-
-        if (!CollectionUtils.isNullOrEmpty(imagePosts)) {
-            images = imagePosts.stream().map(ImagePost::getImage).collect(Collectors.toList());
-        }
-        return images;
     }
 
     public User getUser(Long userId) {

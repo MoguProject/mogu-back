@@ -1,6 +1,5 @@
 package com.teamof4.mogu.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.teamof4.mogu.dto.ProjectStudyDto.*;
-import static javax.persistence.FetchType.*;
 
 @Entity
 @Getter
@@ -26,6 +24,10 @@ public class ProjectStudy {
     @OneToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     @Size(max = 45)
     private String preferredMethod;
@@ -45,9 +47,12 @@ public class ProjectStudy {
 
     private LocalDate startAt;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "projectStudy", fetch = LAZY)
+    @OneToMany(mappedBy = "projectStudy")
     private List<PostSkill> postSkills = new ArrayList<>();
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
 
     public void updateProjectStudy(Request dto) {
         this.preferredMethod = dto.getPreferredMethod();
