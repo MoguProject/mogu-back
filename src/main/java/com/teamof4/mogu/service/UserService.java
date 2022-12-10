@@ -139,13 +139,19 @@ public class UserService {
         List<UserSkill> originalUserSkills = user.getUserSkills();
         List<String> updatingSkillNames = updateRequest.getSkills();
 
+        //기존 스킬들 중에서 삭제될 스킬들 filter
         originalUserSkills
                 .stream()
-                .filter(original -> updatingSkillNames.stream().noneMatch(updating -> original.getSkill().getSkillName().equals(updating)))
+                .filter(original -> updatingSkillNames
+                        .stream()
+                        .noneMatch(updating -> original.getSkill().getSkillName().equals(updating)))
                 .forEach(userSkill -> userSkillRepository.delete(userSkill));
+        //기존 스킬외에 추가될 스킬들 filter
         updatingSkillNames
                 .stream()
-                .filter(updating -> user.getUserSkillNames().stream().noneMatch(original -> updating.equals(original)))
+                .filter(updating -> user.getUserSkillNames()
+                        .stream()
+                        .noneMatch(original -> updating.equals(original)))
                 .map(skillName -> skillRepository.findBySkillName(skillName))
                 .forEach(skill -> userSkillRepository.save(
                         UserSkill.of(user, skill.orElseThrow(() -> new UserSkillNotFoundException()))));
