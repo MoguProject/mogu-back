@@ -229,6 +229,8 @@ public class PostService {
                     .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
             responseList.add(response);
         }
+
+
         return responseList;
     }
 

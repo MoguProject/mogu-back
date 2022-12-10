@@ -17,6 +17,8 @@ import com.teamof4.mogu.util.certification.EmailService;
 import com.teamof4.mogu.util.encryption.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,12 +89,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfoResponse getMyPageInformation(Long userId) {
+    public MyInfoResponse getMyPageInformation(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
-        UserInfoResponse userInfoResponse = user.toUserInfoResponse();
+        MyInfoResponse myInfoResponse = user.toUserInfoResponse();
 
-        return userInfoResponse;
+        return myInfoResponse;
     }
 
     @Transactional(readOnly = true)
@@ -166,6 +168,7 @@ public class UserService {
         return emailService.sendCertificationEmail(requestDto.getEmail());
     }
 
+    @Transactional
     public void updatePassword(UpdatePasswordRequest updatePasswordRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
@@ -192,42 +195,37 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto.MyPageResponse> getPostsILiked(Long userId, Pageable pageable) {
+    public Page<PostDto.MyPageResponse> getPostsILiked(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
-        List<Post> posts = postRepository.findPostsILiked(pageable, user);
-        List<PostDto.MyPageResponse> responses = posts
-                .stream()
-                .map(post -> post.toMyPageResponse(user))
-                .collect(Collectors.toList());
+        Page<Post> posts = postRepository.findPostsILiked(pageable, user);
 
-        return responses;
+        return new PageImpl<>(toMyPageResponse(posts, user), pageable, posts.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto.MyPageResponse> getPostsIReplied(Long userId, Pageable pageable) {
+    public Page<PostDto.MyPageResponse> getPostsIReplied(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
-        List<Post> posts = postRepository.findPostsIReplied(pageable, user);
-        List<PostDto.MyPageResponse> responses = posts.stream()
-                .map(post -> post.toMyPageResponse(user))
-                .collect(Collectors.toList());
+        Page<Post> posts = postRepository.findPostsIReplied(pageable, user);
 
-        return responses;
+        return new PageImpl<>(toMyPageResponse(posts, user), pageable, posts.getTotalElements());
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto.MyPageResponse> getMyParticipatingPosts(Long userId, Pageable pageable, CategoryNames categoryName) {
+    public Page<PostDto.MyPageResponse> getMyParticipatingPosts(Long userId, Pageable pageable, CategoryNames categoryName) {
         Category category = categoryRepository.findByCategoryName(categoryName.getKorName())
                 .orElseThrow(() -> new CategoryNotFoundException("해당 카테고리가 존재하지 않습니다."));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
-        List<Post> posts = postRepository.findMyPostsByUserAndCategory(pageable, user, category);
-        List<PostDto.MyPageResponse> responses = posts
-                .stream()
+        Page<Post> posts = postRepository.findMyPostsByUserAndCategory(pageable, user, category);
+
+        return new PageImpl<>(toMyPageResponse(posts, user), pageable, posts.getTotalElements());
+    }
+
+    public List<PostDto.MyPageResponse> toMyPageResponse(Page<Post> posts, User user) {
+        return posts.stream()
                 .map(post -> post.toMyPageResponse(user))
                 .collect(Collectors.toList());
-
-        return responses;
     }
 }

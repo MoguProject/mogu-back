@@ -2,10 +2,8 @@ package com.teamof4.mogu.security;
 
 import com.sun.istack.NotNull;
 import com.teamof4.mogu.dto.JwtErrorResponseDto;
-import com.teamof4.mogu.exception.user.TokenNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -43,8 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             //요청에서 토큰 가져오기
             String token = parsBearerToken(request);
-            log.info("-JwtAuthenticationFilter 동작 중-");
-            System.out.println("token = " + token);
+            log.info("-JwtFilter 동작 중-");
 
             // 토큰 검사하기 및 시큐리티 등록
             if (token != null && !token.equalsIgnoreCase("null")) {
@@ -58,10 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authenticationToken);
                 SecurityContextHolder.setContext(securityContext);
-                filterChain.doFilter(request, response);
-            } else {
-                filterChain.doFilter(request, response);
             }
+            filterChain.doFilter(request, response);
         } catch (ExpiredJwtException exception) {
             log.warn("토큰 기한 만료");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -72,11 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(JwtErrorResponseDto
                     .of(HttpStatus.UNAUTHORIZED, "token-signature-mismatch", exception.getMessage()).convertToJson());
-        } catch (TokenNotFoundException exception) {
-            log.warn("토큰 없음");
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(JwtErrorResponseDto
-                    .of(HttpStatus.UNAUTHORIZED, "token-not-found", exception.getMessage()).convertToJson());
         } catch (JwtException exception) {
             log.warn("토큰 이상");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -86,14 +74,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String parsBearerToken(HttpServletRequest httpServletRequest) {
+        String token = null;
+
         if (httpServletRequest.getCookies() != null) {
-            String token = Arrays
+            token = Arrays
                     .stream(httpServletRequest.getCookies())
                     .filter(cookie -> cookie.getName().equals("access-token"))
                     .collect(Collectors.toList())
                     .get(0).getValue();
-            return token;
         }
-        return null;
+
+        return token;
     }
 }
