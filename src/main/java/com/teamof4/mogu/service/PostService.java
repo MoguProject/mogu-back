@@ -178,7 +178,7 @@ public class PostService {
         return reply.getId();
     }
 
-    public void 정deleteReply(Long replyId, Long currentUserId) {
+    public void deleteReply(Long replyId, Long currentUserId) {
         Reply reply = getReply(replyId);
 
         User user = getUser(currentUserId);
