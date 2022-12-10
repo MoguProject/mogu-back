@@ -2,7 +2,7 @@ package com.teamof4.mogu.entity;
 
 import com.teamof4.mogu.dto.UserDto.LoginInfoResponse;
 import com.teamof4.mogu.dto.UserDto.UpdateRequest;
-import com.teamof4.mogu.dto.UserDto.UserInfoResponse;
+import com.teamof4.mogu.dto.UserDto.MyInfoResponse;
 import lombok.*;
 
 import javax.persistence.*;
@@ -70,8 +70,8 @@ public class User extends BaseTimeEntity {
                 .build();
     }
 
-    public UserInfoResponse toUserInfoResponse() {
-        return UserInfoResponse.builder()
+    public MyInfoResponse toUserInfoResponse() {
+        return MyInfoResponse.builder()
                 .profileImageUrl(this.image.getImageUrl())
                 .email(this.email)
                 .name(this.name)

@@ -15,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -186,7 +187,7 @@ public class UserControllerTest {
     @WithMockCustomUser
     void getMyPageInformation_Success() throws Exception {
         given(userService.getMyPageInformation(1L))
-                .willReturn(UserInfoResponse.builder()
+                .willReturn(MyInfoResponse.builder()
                         .email("email@email.com")
                         .nickname("frost")
                         .name("최준석")
@@ -365,8 +366,7 @@ public class UserControllerTest {
     @WithMockCustomUser
     void getMyProjectPosts_Success() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        ArrayList<MyPageResponse> response = new ArrayList<>();
-        response.add(MyPageResponse.builder().build());
+        Page response = new PageImpl(new ArrayList());
 
         given(userService.getMyParticipatingPosts(1L, pageable, CategoryNames.PROJECT))
                 .willReturn(response);
@@ -387,8 +387,7 @@ public class UserControllerTest {
     @WithMockCustomUser
     void getMyStudyPosts_Success() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        ArrayList<MyPageResponse> response = new ArrayList<>();
-        response.add(MyPageResponse.builder().build());
+        Page response = new PageImpl(new ArrayList());
 
         given(userService.getMyParticipatingPosts(1L, pageable, CategoryNames.STUDY))
                 .willReturn(response);
@@ -410,8 +409,7 @@ public class UserControllerTest {
     @WithMockCustomUser
     void getPostsILiked_Success() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        ArrayList<MyPageResponse> response = new ArrayList<>();
-        response.add(MyPageResponse.builder().build());
+        Page response = new PageImpl(new ArrayList());
 
         given(userService.getPostsILiked(1L, pageable))
                 .willReturn(response);
@@ -433,8 +431,7 @@ public class UserControllerTest {
     @WithMockCustomUser
     void getPostsIReplied_Success() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        ArrayList<MyPageResponse> response = new ArrayList<>();
-        response.add(MyPageResponse.builder().build());
+        Page response = new PageImpl(new ArrayList());
 
         given(userService.getPostsIReplied(1L, pageable))
                 .willReturn(response);

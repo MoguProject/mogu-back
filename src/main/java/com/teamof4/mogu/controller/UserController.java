@@ -2,13 +2,12 @@ package com.teamof4.mogu.controller;
 
 import com.teamof4.mogu.constants.CategoryNames;
 import com.teamof4.mogu.dto.PostDto.MyPageResponse;
-import com.teamof4.mogu.dto.UserDto.*;
 import com.teamof4.mogu.service.UserService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.List;
 
 import static com.teamof4.mogu.constants.ResponseConstants.CREATED;
 import static com.teamof4.mogu.constants.ResponseConstants.OK;
@@ -70,17 +68,13 @@ public class UserController {
     @GetMapping("/login/info")
     @ApiOperation(value = "로그인 정보 반환")
     public ResponseEntity<LoginInfoResponse> getLoginInformation(@AuthenticationPrincipal Long userId) {
-        LoginInfoResponse loginInfoResponse = userService.getLoginInformation(userId);
-
-        return ResponseEntity.ok(loginInfoResponse);
+        return ResponseEntity.ok(userService.getLoginInformation(userId));
     }
 
     @GetMapping("/mypage")
     @ApiOperation(value = "마이페이지 회원정보 반환")
-    public ResponseEntity<UserInfoResponse> getMyPageInformation(@AuthenticationPrincipal Long userId) {
-        UserInfoResponse userInfoResponse = userService.getMyPageInformation(userId);
-
-        return ResponseEntity.ok(userInfoResponse);
+    public ResponseEntity<MyInfoResponse> getMyPageInformation(@AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(userService.getMyPageInformation(userId));
     }
 
     @PutMapping("/update")
@@ -94,7 +88,7 @@ public class UserController {
     }
 
     @PutMapping("/update/password")
-    @ApiModelProperty(value = "비밀번호 변경")
+    @ApiOperation(value = "비밀번호 변경")
     public ResponseEntity<Void> updatePassword(@Valid @RequestBody UpdatePasswordRequest requestDto,
                                                @AuthenticationPrincipal Long userId) {
         userService.updatePassword(requestDto, userId);
@@ -104,7 +98,8 @@ public class UserController {
 
     @PostMapping("/delete")
     @ApiOperation(value = "회원탈퇴")
-    public ResponseEntity<Void> delete(@Valid @RequestBody DeleteRequest requestDto, @AuthenticationPrincipal Long userId) {
+    public ResponseEntity<Void> delete(@Valid @RequestBody DeleteRequest requestDto,
+                                       @AuthenticationPrincipal Long userId) {
         userService.delete(requestDto, userId);
 
         return OK;
@@ -128,37 +123,29 @@ public class UserController {
 
     @GetMapping("/mypage/post/project")
     @ApiOperation(value = "마이페이지 내가 모집중인 프로젝트")
-    public ResponseEntity<List> getMyProjectPosts(@PageableDefault Pageable pageable,
+    public ResponseEntity<Page> getMyProjectPosts(@PageableDefault Pageable pageable,
                                                   @AuthenticationPrincipal Long userId) {
-        List<MyPageResponse> response = userService.getMyParticipatingPosts(userId, pageable, CategoryNames.PROJECT);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.getMyParticipatingPosts(userId, pageable, CategoryNames.PROJECT));
     }
 
     @GetMapping("/mypage/post/study")
     @ApiOperation(value = "마이페이지 내가 모집중인 스터디")
-    public ResponseEntity<List<MyPageResponse>> getMyStudyPosts(@PageableDefault Pageable pageable,
+    public ResponseEntity<Page<MyPageResponse>> getMyStudyPosts(@PageableDefault Pageable pageable,
                                                                 @AuthenticationPrincipal Long userId) {
-        List<MyPageResponse> response = userService.getMyParticipatingPosts(userId, pageable, CategoryNames.STUDY);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.getMyParticipatingPosts(userId, pageable, CategoryNames.STUDY));
     }
 
     @GetMapping("/mypage/post/liked")
     @ApiOperation(value = "마이페이지 내가 좋아요 한 게시물 리스트")
-    public ResponseEntity<List<MyPageResponse>> getPostsILiked(@PageableDefault Pageable pageable,
-                                                                @AuthenticationPrincipal Long userId) {
-        List<MyPageResponse> response = userService.getPostsILiked(userId, pageable);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Page<MyPageResponse>> getPostsILiked(@PageableDefault Pageable pageable,
+                                                               @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(userService.getPostsILiked(userId, pageable));
     }
 
     @GetMapping("/mypage/post/replied")
     @ApiOperation(value = "마이페이지 내가 댓글 단 게시물 리스트")
-    public ResponseEntity<List<MyPageResponse>> getPostsIReplied(@PageableDefault Pageable pageable,
+    public ResponseEntity<Page<MyPageResponse>> getPostsIReplied(@PageableDefault Pageable pageable,
                                                                  @AuthenticationPrincipal Long userId) {
-        List<MyPageResponse> response = userService.getPostsIReplied(userId, pageable);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.getPostsIReplied(userId, pageable));
     }
 }

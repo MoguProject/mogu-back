@@ -55,6 +55,7 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = LAZY, cascade = REMOVE)
     private List<Reply> replies;
 
+    @BatchSize(size = 10)
     @OneToOne(mappedBy = "post", cascade = REMOVE)
     private ProjectStudy projectStudies;
 

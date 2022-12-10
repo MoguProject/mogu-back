@@ -112,7 +112,7 @@ public class UserDto {
 
     @Getter
     @Builder
-    public static class UserInfoResponse {
+    public static class MyInfoResponse {
 
         @ApiModelProperty(notes = "회원 프로필 이미지 URL")
         private String profileImageUrl;
