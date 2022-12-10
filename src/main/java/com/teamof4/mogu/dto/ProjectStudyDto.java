@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProjectStudyDto {
 
@@ -126,10 +127,10 @@ public class ProjectStudyDto {
         private boolean openStatus;
 
         @ApiModelProperty(notes = "기술 스택 리스트")
-        private List<PostSkill> postSkills;
+        private List<Skill> postSkills;
 
-        @ApiModelProperty(notes = "게시글 이미지 리스트")
-        private List<Image> imageList;
+        @ApiModelProperty(notes = "대표 이미지")
+        private String mainImage;
 
         @ApiModelProperty(notes = "시작 예정일")
         private LocalDate startAt;
@@ -141,7 +142,7 @@ public class ProjectStudyDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, ProjectStudy projectStudy, List<Image> images, boolean isLiked) {
+        public Response(Post post, ProjectStudy projectStudy, boolean isLiked) {
 
             this.postId = post.getId();
             this.userId = post.getUser().getId();
@@ -160,8 +161,9 @@ public class ProjectStudyDto {
             this.contactMethod = projectStudy.getContactMethod();
             this.contactInfo = projectStudy.getContactInfo();
             this.openStatus = projectStudy.isOpenStatus();
-            this.postSkills = projectStudy.getPostSkills();
-            this.imageList = images;
+            this.postSkills = projectStudy.getPostSkills().stream()
+                    .map(PostSkill::getSkill).collect(Collectors.toList());
+            this.mainImage = projectStudy.getImage().getImageUrl();
             this.startAt = projectStudy.getStartAt();
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();

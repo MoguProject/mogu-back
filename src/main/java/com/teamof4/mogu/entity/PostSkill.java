@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -19,15 +18,12 @@ public class PostSkill extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Valid
     @JsonIgnore
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "project_study_id")
     private ProjectStudy projectStudy;
 
-    @Valid
-    @JsonIgnore
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne
     @JoinColumn(name = "skill_id")
     private Skill skill;
 

@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -84,21 +85,24 @@ public class ProjectStudyController {
 
     @PostMapping("/create")
     @ApiOperation(value = "프로젝트/스터디 게시글 등록")
-    public ResponseEntity<Long> saveProjectStudy(@Valid SaveRequest postDto,
+    public ResponseEntity<Long> saveProjectStudy(@Valid @RequestPart SaveRequest postDto,
                                                  @Valid @RequestPart Request projectStudyDto,
+                                                 @RequestPart(required = false) MultipartFile multipartFile,
                                                  @AuthenticationPrincipal Long userId) {
         if (userId == null) {
             throw new UserNotLoginedException();
         }
 
-        return ResponseEntity.ok(projectStudyService.saveProjectStudy(postDto, projectStudyDto, userId));
+        return ResponseEntity.ok(projectStudyService.saveProjectStudy(postDto, projectStudyDto, multipartFile, userId));
     }
 
     @PostMapping("/update/{postId}")
     @ApiOperation(value = "프로젝트/스터디 게시글 수정")
     public ResponseEntity<Long> updatePost(@PathVariable Long postId,
-                                           @Valid UpdateRequest postDto,
-                                           @Valid @RequestPart Request projectStudyDto) {
-        return ResponseEntity.ok(projectStudyService.updateProjectStudy(postId, postDto, projectStudyDto));
+                                           @Valid @RequestPart UpdateRequest postDto,
+                                           @Valid @RequestPart Request projectStudyDto,
+                                           @RequestPart(required = false) MultipartFile multipartFile,
+                                           @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(projectStudyService.updateProjectStudy(postId, postDto, projectStudyDto, multipartFile, userId));
     }
 }

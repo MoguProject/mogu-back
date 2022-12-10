@@ -3,6 +3,7 @@ package com.teamof4.mogu.service;
 import com.teamof4.mogu.dto.ImageDto;
 import com.teamof4.mogu.entity.Image;
 import com.teamof4.mogu.exception.image.FailedImageUploadException;
+import com.teamof4.mogu.exception.image.ImageNotFoundException;
 import com.teamof4.mogu.repository.ImageRepository;
 import com.teamof4.mogu.util.aws.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,16 @@ public class ImageService {
     private final AwsS3Service awsS3Service;
 
     private final int SPLIT_INDEX = 57;
+
+    public Image getImageByImageUrl(String imageUrl) {
+        return imageRepository.findByImageUrl(imageUrl)
+                .orElseThrow(ImageNotFoundException::new);
+    }
+
+    public Image getImageById(Long imageId) {
+        return imageRepository.findById(imageId)
+                .orElseThrow(ImageNotFoundException::new);
+    }
 
     @Transactional
     public Image saveDefaultProfileImage() {
@@ -43,9 +54,14 @@ public class ImageService {
         }
     }
 
-    public Image savePostImage(MultipartFile profileImage) {
+    @Transactional
+    public void deletePostImage(String imageUrl) {
+        deleteImage(getImageByImageUrl(imageUrl));
+    }
 
-        String imageUrl = awsS3Service.uploadImage(profileImage);
+    public Image savePostImage(MultipartFile postImage) {
+
+        String imageUrl = awsS3Service.uploadImage(postImage);
         Image image = Image.builder()
                 .imageUrl(imageUrl)
                 .build();
@@ -55,9 +71,9 @@ public class ImageService {
 
 
     @Transactional
-    public void deleteImage(Image targetTmage) {
-        String fileName = targetTmage.getImageUrl().substring(SPLIT_INDEX);
+    public void deleteImage(Image targetImage) {
+        String fileName = targetImage.getImageUrl().substring(SPLIT_INDEX);
         awsS3Service.deleteImage(fileName);
-        imageRepository.delete(targetTmage);
+        imageRepository.delete(targetImage);
     }
 }

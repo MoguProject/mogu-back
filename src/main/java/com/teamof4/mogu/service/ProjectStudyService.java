@@ -13,12 +13,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.teamof4.mogu.constants.DefaultImageConstants.DEFAULT_POST_IMAGE_ID;
 import static com.teamof4.mogu.constants.SortStatus.ALL;
 import static com.teamof4.mogu.constants.SortStatus.OPENED;
 import static com.teamof4.mogu.dto.PostDto.*;
@@ -32,6 +33,8 @@ public class ProjectStudyService {
     private final ProjectStudyRepository projectStudyRepository;
     private final PostSkillRepository postSkillRepository;
     private final PostService postService;
+    private final ImageService imageService;
+
 
     public Page<ProjectStudyDto.Response> getSearchedList(Long categoryId, String keyword, Long currentUserId,
                                                              Pageable pageable, SortStatus status) {
@@ -40,14 +43,15 @@ public class ProjectStudyService {
         Page<ProjectStudy> projectStudies =
                 projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, category, pageable);
 
-        Page<ProjectStudyDto.Response> projectStudyDtoList = new PageImpl<>(Collections.emptyList());
+        List<ProjectStudyDto.Response> projectStudyDtoList = new ArrayList<>();
+
         if (status.equals(ALL)) {
-            projectStudyDtoList = getResponses(projectStudies, currentUserId);
+            projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
         } else if (status.equals(OPENED)) {
-            projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies, currentUserId));
+            projectStudyDtoList = getOpenedPostList(entityToListDto(projectStudies, currentUserId));
         }
 
-        return projectStudyDtoList;
+        return new PageImpl<>(projectStudyDtoList, pageable, projectStudies.getTotalElements());
     }
 
     public Page<ProjectStudyDto.Response> getProjectStudyList(Long categoryId, Pageable pageable,
@@ -56,24 +60,24 @@ public class ProjectStudyService {
         Category category = postService.getCategory(categoryId);
         Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(category, pageable);
 
-        Page<ProjectStudyDto.Response> projectStudyDtoList = new PageImpl<>(Collections.emptyList());
+        List<ProjectStudyDto.Response> projectStudyDtoList = new ArrayList<>();
 
         switch (status) {
             case ALL:
-                projectStudyDtoList = getResponses(projectStudies, currentUserId);
+                projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
                 break;
             case OPENED:
-                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies, currentUserId));
+                projectStudyDtoList = getOpenedPostList(entityToListDto(projectStudies, currentUserId));
                 break;
             case LIKES:
                 projectStudies = projectStudyRepository.findAllLikesDesc(category, pageable);
-                projectStudyDtoList = getOpenedPageImpl(getResponses(projectStudies, currentUserId));
+                projectStudyDtoList = getOpenedPostList(entityToListDto(projectStudies, currentUserId));
                 break;
             case DEFAULT:
                 break;
         }
 
-        return projectStudyDtoList;
+        return new PageImpl<>(projectStudyDtoList, pageable, projectStudies.getTotalElements());
     }
 
     public ProjectStudyDto.Response getProjectStudyDetails(Long postId, Long currentUserId) {
@@ -89,18 +93,22 @@ public class ProjectStudyService {
         return ProjectStudyDto.Response.builder()
                 .post(post)
                 .projectStudy(projectStudy)
-                .images(postService.getImages(post.getImages()))
                 .isLiked(postService.isLikedByCurrentUser(currentUserId, post)).build();
 
     }
 
     @Transactional
-    public Long saveProjectStudy(SaveRequest postDTO, Request projectStudyDTO, Long currentUserId) {
+    public Long saveProjectStudy(SaveRequest postDTO, Request projectStudyDTO,
+                                 MultipartFile multipartFile, Long currentUserId) {
 
         Long postId = postService.savePost(postDTO, currentUserId);
         Post post = postService.getPost(postId);
 
         ProjectStudy projectStudy = projectStudyDTO.toEntity(post);
+
+        Image image = getImage(multipartFile);
+        projectStudy.setImage(image);
+
         projectStudyRepository.save(projectStudy);
 
         savePostSkill(projectStudyDTO.getSkills(), projectStudy);
@@ -110,11 +118,18 @@ public class ProjectStudyService {
 
     @Transactional
     public Long updateProjectStudy(Long postId, UpdateRequest postDTO,
-                                   Request projectStudyDTO) {
+                                   Request projectStudyDTO, MultipartFile multipartFile,
+                                   Long currentUserId) {
 
-        postService.updatePost(postId, postDTO);
+        postService.updatePost(postId, postDTO, currentUserId);
 
         ProjectStudy projectStudy = getProjectStudy(postId);
+
+        if (!multipartFile.isEmpty()) {
+            Image image = imageService.savePostImage(multipartFile);
+            projectStudy.setImage(image);
+        }
+
         projectStudy.updateProjectStudy(projectStudyDTO);
 
         projectStudyRepository.save(projectStudy);
@@ -127,6 +142,18 @@ public class ProjectStudyService {
                 .orElseThrow(() -> new ProjectStudyNotFoundException("프로젝트/스터디 상세 정보가 존재하지 않습니다."));
     }
 
+    private Image getImage(MultipartFile multipartFile) {
+        Image image;
+
+        if (multipartFile == null) {
+            image = imageService.getImageById(DEFAULT_POST_IMAGE_ID);
+        } else {
+            image = imageService.savePostImage(multipartFile);
+        }
+
+        return image;
+    }
+
     private void savePostSkill(List<Skill> skills, ProjectStudy projectStudy) {
         for (Skill skill : skills) {
             PostSkill postSkill = PostSkill.builder()
@@ -136,25 +163,19 @@ public class ProjectStudyService {
         }
     }
 
-    private Page<ProjectStudyDto.Response> getResponses(Page<ProjectStudy> projectStudies, Long currentUserId) {
-        List<ProjectStudyDto.Response> responseList = new ArrayList<>();
+    private List<ProjectStudyDto.Response> entityToListDto(Page<ProjectStudy> projectStudies, Long currentUserId) {
 
-        for (ProjectStudy post : projectStudies) {
-
-            ProjectStudyDto.Response response = ProjectStudyDto.Response.builder()
-                    .post(post.getPost())
-                    .projectStudy(post)
-                    .images(postService.getImages(post.getPost().getImages()))
-                    .isLiked(postService.isLikedByCurrentUser(currentUserId, post.getPost())).build();
-
-            responseList.add(response);
-        }
-        return new PageImpl<>(responseList);
+        return projectStudies.stream()
+                .map(post -> ProjectStudyDto.Response.builder()
+                        .post(post.getPost())
+                        .projectStudy(post)
+                        .isLiked(postService.isLikedByCurrentUser(currentUserId, post.getPost())).build())
+                .collect(Collectors.toList());
     }
 
-    private PageImpl<ProjectStudyDto.Response> getOpenedPageImpl(Page<ProjectStudyDto.Response> projectStudies) {
-        return new PageImpl<>(projectStudies.stream()
+    private List<ProjectStudyDto.Response> getOpenedPostList(List<ProjectStudyDto.Response> projectStudies) {
+        return projectStudies.stream()
                 .filter(ProjectStudyDto.Response::isOpenStatus)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 }
