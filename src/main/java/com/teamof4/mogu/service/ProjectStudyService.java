@@ -13,12 +13,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.teamof4.mogu.constants.DefaultImageConstants.DEFAULT_POST_IMAGE_ID;
 import static com.teamof4.mogu.constants.SortStatus.ALL;
 import static com.teamof4.mogu.constants.SortStatus.OPENED;
 import static com.teamof4.mogu.dto.PostDto.*;
@@ -32,6 +34,8 @@ public class ProjectStudyService {
     private final ProjectStudyRepository projectStudyRepository;
     private final PostSkillRepository postSkillRepository;
     private final PostService postService;
+    private final ImageService imageService;
+
 
     public Page<ProjectStudyDto.Response> getSearchedList(Long categoryId, String keyword, Long currentUserId,
                                                              Pageable pageable, SortStatus status) {
@@ -89,18 +93,22 @@ public class ProjectStudyService {
         return ProjectStudyDto.Response.builder()
                 .post(post)
                 .projectStudy(projectStudy)
-                .images(postService.getImages(post.getImages()))
                 .isLiked(postService.isLikedByCurrentUser(currentUserId, post)).build();
 
     }
 
     @Transactional
-    public Long saveProjectStudy(SaveRequest postDTO, Request projectStudyDTO, Long currentUserId) {
+    public Long saveProjectStudy(SaveRequest postDTO, Request projectStudyDTO,
+                                 MultipartFile multipartFile, Long currentUserId) {
 
         Long postId = postService.savePost(postDTO, currentUserId);
         Post post = postService.getPost(postId);
 
         ProjectStudy projectStudy = projectStudyDTO.toEntity(post);
+
+        Image image = getImage(multipartFile);
+        projectStudy.setImage(image);
+
         projectStudyRepository.save(projectStudy);
 
         savePostSkill(projectStudyDTO.getSkills(), projectStudy);
@@ -110,11 +118,18 @@ public class ProjectStudyService {
 
     @Transactional
     public Long updateProjectStudy(Long postId, UpdateRequest postDTO,
-                                   Request projectStudyDTO) {
+                                   Request projectStudyDTO, MultipartFile multipartFile,
+                                   Long currentUserId) {
 
-        postService.updatePost(postId, postDTO);
+        postService.updatePost(postId, postDTO, currentUserId);
 
         ProjectStudy projectStudy = getProjectStudy(postId);
+
+        if (!multipartFile.isEmpty()) {
+            Image image = imageService.savePostImage(multipartFile);
+            projectStudy.setImage(image);
+        }
+
         projectStudy.updateProjectStudy(projectStudyDTO);
 
         projectStudyRepository.save(projectStudy);
@@ -125,6 +140,18 @@ public class ProjectStudyService {
     private ProjectStudy getProjectStudy(Long postId) {
         return projectStudyRepository.findByPost(postService.getPost(postId))
                 .orElseThrow(() -> new ProjectStudyNotFoundException("프로젝트/스터디 상세 정보가 존재하지 않습니다."));
+    }
+
+    private Image getImage(MultipartFile multipartFile) {
+        Image image;
+
+        if (multipartFile == null) {
+            image = imageService.getImageById(DEFAULT_POST_IMAGE_ID);
+        } else {
+            image = imageService.savePostImage(multipartFile);
+        }
+
+        return image;
     }
 
     private void savePostSkill(List<Skill> skills, ProjectStudy projectStudy) {
@@ -144,7 +171,6 @@ public class ProjectStudyService {
             ProjectStudyDto.Response response = ProjectStudyDto.Response.builder()
                     .post(post.getPost())
                     .projectStudy(post)
-                    .images(postService.getImages(post.getPost().getImages()))
                     .isLiked(postService.isLikedByCurrentUser(currentUserId, post.getPost())).build();
 
             responseList.add(response);

@@ -1,7 +1,6 @@
 package com.teamof4.mogu.dto;
 
 import com.teamof4.mogu.entity.Category;
-import com.teamof4.mogu.entity.Image;
 import com.teamof4.mogu.entity.Post;
 import com.teamof4.mogu.entity.User;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -35,9 +33,6 @@ public class PostDto {
         @NotBlank(message = "내용을 입력해 주세요.")
         private String content;
 
-        @ApiParam(value = "게시글 이미지 리스트")
-        private List<MultipartFile> multipartFiles;
-
         public Post toEntity(User user, Category category) {
             return Post.builder()
                     .user(user)
@@ -59,9 +54,6 @@ public class PostDto {
         @ApiParam(value = "글 내용", required = true)
         @NotBlank(message = "내용을 입력해 주세요.")
         private String content;
-
-        @ApiParam(value = "게시글 이미지 리스트")
-        private List<MultipartFile> multipartFiles;
 
     }
 
@@ -98,9 +90,6 @@ public class PostDto {
         @ApiModelProperty(notes = "로그인 한 유저의 좋아요 여부")
         private boolean likeStatus;
 
-        @ApiModelProperty(notes = "게시글 이미지 리스트")
-        private List<Image> imageList;
-
         @ApiModelProperty(notes = "댓글 리스트")
         private List<ReplyDto.Response> replyList;
 
@@ -111,7 +100,7 @@ public class PostDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, List<Image> images, List<ReplyDto.Response> replies, boolean isLiked) {
+        public Response(Post post, List<ReplyDto.Response> replies, boolean isLiked) {
             this.id = post.getId();
             this.userId = post.getUser().getId();
             this.categoryId = post.getCategory().getId();
@@ -122,7 +111,6 @@ public class PostDto {
             this.view = post.getView();
             this.likeCount = post.getLikes().size();
             this.likeStatus = isLiked;
-            this.imageList = images;
             this.replyList = replies;
             this.createdAt = post.getCreatedAt();
             this.updatedAt = post.getUpdatedAt();

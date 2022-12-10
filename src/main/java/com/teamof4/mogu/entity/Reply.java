@@ -67,7 +67,7 @@ public class Reply extends BaseTimeEntity {
         this.content = content;
     }
 
-    public void deleteReply() {
+    public void changeDeleteStatus() {
         this.isDeleted = true;
     }
 

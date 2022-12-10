@@ -1,7 +1,5 @@
 package com.teamof4.mogu.constants;
 
-import java.util.Arrays;
-import java.util.List;
 
 public class EmailConstants {
 
