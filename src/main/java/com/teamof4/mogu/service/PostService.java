@@ -51,7 +51,7 @@ public class PostService {
             posts = postRepository.findAllLikesDesc(pageable, category);
         }
 
-        return new PageImpl<>(getResponses(posts, currentUserId));
+        return new PageImpl<>(entityToListDto(posts, currentUserId), pageable, posts.getTotalElements());
     }
 
     public PostDto.Response getPostDetails(Long postId, Long currentUserId) {
@@ -204,16 +204,12 @@ public class PostService {
         return isLiked;
     }
 
-    private List<PostDto.Response> getResponses(Page<Post> posts, Long currentUserId) {
-        List<PostDto.Response> responseList = new ArrayList<>();
-
-        for (Post post : posts) {
-            PostDto.Response response = PostDto.Response.builder()
-                    .post(post)
-                    .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
-            responseList.add(response);
-        }
-        return responseList;
+    private List<PostDto.Response> entityToListDto(Page<Post> posts, Long currentUserId) {
+        return posts.stream()
+                .map(post -> PostDto.Response.builder()
+                        .post(post).
+                        isLiked(isLikedByCurrentUser(currentUserId, post)).build())
+                .collect(Collectors.toList());
     }
 
     public List<Response> replyConvertToDto(List<Reply> replies) {
