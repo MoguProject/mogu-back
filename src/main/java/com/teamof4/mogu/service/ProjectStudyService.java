@@ -90,9 +90,12 @@ public class ProjectStudyService {
 
         ProjectStudy projectStudy = getProjectStudy(post.getId());
 
+        List<Reply> replyList = postService.getReplies(post);
+
         return ProjectStudyDto.Response.builder()
                 .post(post)
                 .projectStudy(projectStudy)
+                .replies(postService.replyConvertToDto(replyList))
                 .isLiked(postService.isLikedByCurrentUser(currentUserId, post)).build();
 
     }
