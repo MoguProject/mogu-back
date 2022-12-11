@@ -67,7 +67,8 @@ public class ProjectStudyDto {
                     .contactMethod(contactMethod)
                     .contactInfo(contactInfo)
                     .memberCount(memberCount)
-                    .startAt(startAt).build();
+                    .startAt(startAt)
+                    .openStatus(openStatus).build();
         }
 
     }
