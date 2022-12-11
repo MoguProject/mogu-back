@@ -129,6 +129,9 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "기술 스택 리스트")
         private List<Skill> postSkills;
 
+        @ApiModelProperty(notes = "댓글 리스트")
+        private List<ReplyDto.Response> replyList;
+
         @ApiModelProperty(notes = "대표 이미지")
         private String mainImage;
 
@@ -142,7 +145,8 @@ public class ProjectStudyDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, ProjectStudy projectStudy, boolean isLiked) {
+        public Response(Post post, ProjectStudy projectStudy,
+                        List<ReplyDto.Response> replies, boolean isLiked) {
 
             this.postId = post.getId();
             this.userId = post.getUser().getId();
@@ -163,6 +167,7 @@ public class ProjectStudyDto {
             this.openStatus = projectStudy.isOpenStatus();
             this.postSkills = projectStudy.getPostSkills().stream()
                     .map(PostSkill::getSkill).collect(Collectors.toList());
+            this.replyList = replies;
             this.mainImage = projectStudy.getImage().getImageUrl();
             this.startAt = projectStudy.getStartAt();
             this.createdAt = post.getCreatedAt();

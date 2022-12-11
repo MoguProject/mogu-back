@@ -63,13 +63,9 @@ public class PostService {
             postRepository.save(post);
         }
 
-        List<Reply> replyList = post.getReplies().stream()
-                .filter(reply -> reply.getParentReply() == null)
-                .collect(Collectors.toList());
-
         return PostDto.Response.builder()
                 .post(post)
-                .replies(replyConvertToDto(replyList))
+                .replies(replyConvertToDto(getReplies(post)))
                 .isLiked(isLikedByCurrentUser(currentUserId, post)).build();
 
     }
@@ -207,8 +203,8 @@ public class PostService {
     private List<PostDto.Response> entityToListDto(Page<Post> posts, Long currentUserId) {
         return posts.stream()
                 .map(post -> PostDto.Response.builder()
-                        .post(post).
-                        isLiked(isLikedByCurrentUser(currentUserId, post)).build())
+                        .post(post)
+                        .isLiked(isLikedByCurrentUser(currentUserId, post)).build())
                 .collect(Collectors.toList());
     }
 
@@ -254,5 +250,11 @@ public class PostService {
     private Reply getReply(Long replyId) {
         return replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyNotFoundException("댓글이 존재하지 않습니다."));
+    }
+
+    public List<Reply> getReplies(Post post) {
+        return post.getReplies().stream()
+                .filter(reply -> reply.getParentReply() == null)
+                .collect(Collectors.toList());
     }
 }
