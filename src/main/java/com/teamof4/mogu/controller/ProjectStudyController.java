@@ -68,12 +68,20 @@ public class ProjectStudyController {
         return ResponseEntity.ok(projectStudyService.getProjectStudyList(categoryId, pageable, userId, OPENED));
     }
 
-    @GetMapping("/list/likes/{categoryId}")
-    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(좋아요 순)", notes = "카테고리 별 / 좋아요 순 / 생성일 기준 내림차 순으로 출력한다.")
-    public ResponseEntity<Page<ProjectStudyDto.Response>> getLikesProjectStudyList(@PathVariable Long categoryId,
+    @GetMapping("/list/all/likes/{categoryId}")
+    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(좋아요 순)", notes = "모집 여부와 상관없이 카테고리 별 / 좋아요 순 / 생성일 기준 내림차 순으로 출력한다.")
+    public ResponseEntity<Page<ProjectStudyDto.Response>> getAllProjectStudyLikesDescList(@PathVariable Long categoryId,
                                                                          @AuthenticationPrincipal Long userId,
                                                                          @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(projectStudyService.getProjectStudyList(categoryId, pageable, userId, LIKES));
+        return ResponseEntity.ok(projectStudyService.getProjectStudyLikesList(categoryId, pageable, userId, ALL));
+    }
+
+    @GetMapping("/list/opened/likes/{categoryId}")
+    @ApiOperation(value = "프로젝트/스터디 게시글 전체 조회(좋아요 순)", notes = "모집 중인 게시글들만 카테고리 별 / 좋아요 순 / 생성일 기준 내림차 순으로 출력한다.")
+    public ResponseEntity<Page<ProjectStudyDto.Response>> getOpenedProjectStudyLikesDescList(@PathVariable Long categoryId,
+                                                                                   @AuthenticationPrincipal Long userId,
+                                                                                   @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(projectStudyService.getProjectStudyLikesList(categoryId, pageable, userId, OPENED));
     }
 
     @GetMapping("/post/{postId}")
