@@ -56,7 +56,7 @@ public class UserController {
 
     @GetMapping("/logout")
     @ApiOperation(value = "사용자 로그아웃")
-    public ResponseEntity<Void> logout(@AuthenticationPrincipal Long userId) {
+    public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("access-token", null)
                 .path("/")
                 .maxAge(0)

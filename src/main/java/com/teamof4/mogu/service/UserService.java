@@ -77,7 +77,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자 입니다."));
 
         if (user.getIsDeleted()) {
-            throw new UserNotFoundException("탈퇴한 회원입니다.");
+            throw new UserDeletedException();
         }
         if (!loginRequest.checkPassword(encryptionService, user.getPassword())) {
             throw new UserNotFoundException("이메일 또는 비밀번호가 일치하지 않습니다.");
@@ -87,6 +87,7 @@ public class UserService {
 
         return token;
     }
+
 
     @Transactional(readOnly = true)
     public MyInfoResponse getMyPageInformation(Long userId) {
@@ -114,9 +115,10 @@ public class UserService {
         checkDuplicatedForUpdate(user, updateRequest);
         user.updateUser(updateRequest);
         updateSkills(user, updateRequest);
-        //profileImage가 null이면 수정 X
+        //profileImage가 null이 아니면 새 이미지 저장하고 기존 이미지 삭제
         if (!profileImage.isEmpty()) {
             user.setImage(imageService.updateProfileImage(profileImage));
+            imageService.deleteProfileImage(user.getImage());
         }
         userRepository.save(user);
     }
@@ -167,7 +169,6 @@ public class UserService {
         }
         user.deleteUser();
         userRepository.save(user);
-        imageService.deleteProfileImage(user.getImage());
     }
 
     public String certificateByEmail(EmailCertificationRequest requestDto) {

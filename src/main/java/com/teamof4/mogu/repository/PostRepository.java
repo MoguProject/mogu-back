@@ -22,7 +22,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "ORDER BY size(p.likes) DESC, p.id DESC ")
     Page<Post> findAllLikesDesc(Pageable pageable, Category category);
 
-    @Query(value = "SELECT  DISTINCT p FROM Post p " +
+    @Query(value = "SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.projectStudies " +
             "JOIN FETCH p.user " +
             "WHERE p.category = :category " +
@@ -32,7 +32,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "WHERE p.category = :category")
     Page<Post> findMyPostsByUserAndCategory(Pageable pageable, User user, Category category);
 
-    @Query(value = "SELECT p FROM Post p " +
+    @Query(value = "SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN FETCH p.projectStudies " +
             "JOIN FETCH p.user " +
             "JOIN FETCH p.category " +
             "JOIN p.likes l " +
@@ -44,6 +45,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findPostsILiked(Pageable pageable, User user);
 
     @Query(value = "SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN FETCH p.projectStudies " +
             "JOIN FETCH p.user " +
             "JOIN FETCH p.category " +
             "JOIN p.replies r " +
