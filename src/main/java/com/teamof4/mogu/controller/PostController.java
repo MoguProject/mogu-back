@@ -22,7 +22,6 @@ import static com.teamof4.mogu.constants.SortStatus.*;
 import static com.teamof4.mogu.dto.PostDto.*;
 import static com.teamof4.mogu.dto.ReplyDto.*;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
