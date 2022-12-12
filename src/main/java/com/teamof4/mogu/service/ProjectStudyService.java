@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,16 +40,17 @@ public class ProjectStudyService {
                                                              Pageable pageable, SortStatus status) {
         Category category = postService.getCategory(categoryId);
 
-        Page<ProjectStudy> projectStudies =
-                projectStudyRepository.findAllByTitleAndContentContainingIgnoreCase(keyword, category, pageable);
-
-        List<ProjectStudyDto.Response> projectStudyDtoList = new ArrayList<>();
+        Page<ProjectStudy> projectStudies = new PageImpl<>(Collections.emptyList());
 
         if (status.equals(ALL)) {
-            projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
+            projectStudies =
+                    projectStudyRepository.findAllByKeyword(keyword, category, pageable);
         } else if (status.equals(OPENED)) {
-            projectStudyDtoList = getOpenedPostList(entityToListDto(projectStudies, currentUserId));
+            projectStudies =
+                    projectStudyRepository.findAllByKeywordAndOpened(keyword, category, pageable);
         }
+
+        List<ProjectStudyDto.Response> projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
 
         return new PageImpl<>(projectStudyDtoList, pageable, projectStudies.getTotalElements());
     }
@@ -58,25 +59,22 @@ public class ProjectStudyService {
                                                               Long currentUserId, SortStatus status) {
 
         Category category = postService.getCategory(categoryId);
-        Page<ProjectStudy> projectStudies = projectStudyRepository.findAll(category, pageable);
-
-        List<ProjectStudyDto.Response> projectStudyDtoList = new ArrayList<>();
+        Page<ProjectStudy> projectStudies = new PageImpl<>(Collections.emptyList());
 
         switch (status) {
             case ALL:
-                projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
+                projectStudies = projectStudyRepository.findAll(category, pageable);
                 break;
             case OPENED:
-                projectStudyDtoList = getOpenedPostList(entityToListDto(projectStudies, currentUserId));
+                projectStudies = projectStudyRepository.findAllOpened(category, pageable);
                 break;
             case LIKES:
                 projectStudies = projectStudyRepository.findAllLikesDesc(category, pageable);
-                projectStudyDtoList = getOpenedPostList(entityToListDto(projectStudies, currentUserId));
                 break;
             case DEFAULT:
                 break;
         }
-
+        List<ProjectStudyDto.Response> projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
         return new PageImpl<>(projectStudyDtoList, pageable, projectStudies.getTotalElements());
     }
 
@@ -173,12 +171,6 @@ public class ProjectStudyService {
                         .post(post.getPost())
                         .projectStudy(post)
                         .isLiked(postService.isLikedByCurrentUser(currentUserId, post.getPost())).build())
-                .collect(Collectors.toList());
-    }
-
-    private List<ProjectStudyDto.Response> getOpenedPostList(List<ProjectStudyDto.Response> projectStudies) {
-        return projectStudies.stream()
-                .filter(ProjectStudyDto.Response::isOpenStatus)
                 .collect(Collectors.toList());
     }
 }
