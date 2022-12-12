@@ -38,7 +38,7 @@ public class PostController {
     @ApiOperation(value = "커뮤니티 게시글 전체 조회(id 기준)", notes = "카테고리 별, id 기준 내림차 순으로 출력한다.")
     public ResponseEntity<Page<PostDto.Response>> getPostList(@PathVariable Long categoryId,
                                                               @AuthenticationPrincipal Long userId,
-             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                              @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(postService.getPostList(categoryId, pageable, userId, DEFAULT));
     }
 
