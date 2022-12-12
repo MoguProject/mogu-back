@@ -61,19 +61,28 @@ public class ProjectStudyService {
         Category category = postService.getCategory(categoryId);
         Page<ProjectStudy> projectStudies = new PageImpl<>(Collections.emptyList());
 
-        switch (status) {
-            case ALL:
-                projectStudies = projectStudyRepository.findAll(category, pageable);
-                break;
-            case OPENED:
-                projectStudies = projectStudyRepository.findAllOpened(category, pageable);
-                break;
-            case LIKES:
-                projectStudies = projectStudyRepository.findAllLikesDesc(category, pageable);
-                break;
-            case DEFAULT:
-                break;
+        if (status.equals(ALL)) {
+            projectStudies = projectStudyRepository.findAll(category, pageable);
+        } else if (status.equals(OPENED)) {
+            projectStudies = projectStudyRepository.findAllOpened(category, pageable);
         }
+
+        List<ProjectStudyDto.Response> projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
+        return new PageImpl<>(projectStudyDtoList, pageable, projectStudies.getTotalElements());
+    }
+
+    public Page<ProjectStudyDto.Response> getProjectStudyLikesList(Long categoryId, Pageable pageable,
+                                                              Long currentUserId, SortStatus status) {
+
+        Category category = postService.getCategory(categoryId);
+        Page<ProjectStudy> projectStudies = new PageImpl<>(Collections.emptyList());
+
+        if (status.equals(ALL)) {
+            projectStudies = projectStudyRepository.findAllLikesDesc(category, pageable);
+        } else if (status.equals(OPENED)) {
+            projectStudies = projectStudyRepository.findAllOpenedLikesDesc(category, pageable);
+        }
+
         List<ProjectStudyDto.Response> projectStudyDtoList = entityToListDto(projectStudies, currentUserId);
         return new PageImpl<>(projectStudyDtoList, pageable, projectStudies.getTotalElements());
     }

@@ -27,9 +27,14 @@ public interface ProjectStudyRepository extends JpaRepository<ProjectStudy, Long
     Page<ProjectStudy> findAllOpened(Category category, Pageable pageable);
 
     @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
-            "WHERE p.category = :category AND ps.openStatus = true " +
+            "WHERE p.category = :category " +
             "ORDER BY size(p.likes) DESC, p.id DESC")
     Page<ProjectStudy> findAllLikesDesc(Category category, Pageable pageable);
+
+    @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
+            "WHERE p.category = :category AND ps.openStatus = true " +
+            "ORDER BY size(p.likes) DESC, p.id DESC")
+    Page<ProjectStudy> findAllOpenedLikesDesc(Category category, Pageable pageable);
 
     @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
             "WHERE p.category = :category " +
