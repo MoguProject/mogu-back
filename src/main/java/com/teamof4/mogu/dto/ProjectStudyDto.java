@@ -67,7 +67,8 @@ public class ProjectStudyDto {
                     .contactMethod(contactMethod)
                     .contactInfo(contactInfo)
                     .memberCount(memberCount)
-                    .startAt(startAt).build();
+                    .startAt(startAt)
+                    .openStatus(openStatus).build();
         }
 
     }
@@ -86,6 +87,9 @@ public class ProjectStudyDto {
 
         @ApiModelProperty(notes = "작성자 닉네임")
         private String userNickname;
+
+        @ApiModelProperty(notes = "작성자 프로필 사진")
+        private String userProfileImage;
 
         @ApiModelProperty(notes = "카테고리 이름")
         private String categoryName;
@@ -129,6 +133,9 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "기술 스택 리스트")
         private List<Skill> postSkills;
 
+        @ApiModelProperty(notes = "댓글 리스트")
+        private List<ReplyDto.Response> replyList;
+
         @ApiModelProperty(notes = "대표 이미지")
         private String mainImage;
 
@@ -142,12 +149,14 @@ public class ProjectStudyDto {
         private LocalDateTime updatedAt;
 
         @Builder
-        public Response(Post post, ProjectStudy projectStudy, boolean isLiked) {
+        public Response(Post post, ProjectStudy projectStudy,
+                        List<ReplyDto.Response> replies, boolean isLiked) {
 
             this.postId = post.getId();
             this.userId = post.getUser().getId();
             this.categoryId = post.getCategory().getId();
             this.userNickname = post.getUser().getNickname();
+            this.userProfileImage = post.getUser().getImage().getImageUrl();
             this.categoryName = post.getCategory().getCategoryName();
             this.title = post.getTitle();
             this.content = post.getContent();
@@ -163,6 +172,7 @@ public class ProjectStudyDto {
             this.openStatus = projectStudy.isOpenStatus();
             this.postSkills = projectStudy.getPostSkills().stream()
                     .map(PostSkill::getSkill).collect(Collectors.toList());
+            this.replyList = replies;
             this.mainImage = projectStudy.getImage().getImageUrl();
             this.startAt = projectStudy.getStartAt();
             this.createdAt = post.getCreatedAt();

@@ -22,13 +22,25 @@ public interface ProjectStudyRepository extends JpaRepository<ProjectStudy, Long
     Page<ProjectStudy> findAll(Category category, Pageable pageable);
 
     @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
-            "WHERE p.category = :category " +
+            "WHERE p.category = :category AND ps.openStatus = true " +
+            "ORDER BY p.id DESC")
+    Page<ProjectStudy> findAllOpened(Category category, Pageable pageable);
+
+    @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
+            "WHERE p.category = :category AND ps.openStatus = true " +
             "ORDER BY size(p.likes) DESC, p.id DESC")
     Page<ProjectStudy> findAllLikesDesc(Category category, Pageable pageable);
 
     @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
             "WHERE p.category = :category " +
-            "AND p.title LIKE %:keyword% OR p.content LIKE %:keyword% " +
+            "AND ( p.title LIKE %:keyword% OR p.content LIKE %:keyword% ) " +
             "ORDER BY p.id DESC")
-    Page<ProjectStudy> findAllByTitleAndContentContainingIgnoreCase(String keyword, Category category, Pageable pageable);
+    Page<ProjectStudy> findAllByKeyword(String keyword, Category category, Pageable pageable);
+
+    @Query("SELECT ps FROM ProjectStudy ps join ps.post p " +
+            "WHERE p.category = :category AND ps.openStatus = true " +
+            "AND ( p.title LIKE %:keyword% OR p.content LIKE %:keyword% ) " +
+            "ORDER BY p.id DESC")
+    Page<ProjectStudy> findAllByKeywordAndOpened(String keyword, Category category, Pageable pageable);
+
 }
