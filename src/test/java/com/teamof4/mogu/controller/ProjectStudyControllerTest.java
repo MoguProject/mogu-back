@@ -210,18 +210,34 @@ public class ProjectStudyControllerTest {
 
         @Test
         @WithMockCustomUser
-        @DisplayName("[성공] 커뮤니티 게시글 전체 조회(좋아요 순)")
-        void selectLikeDescPostList_Success() throws Exception {
+        @DisplayName("[성공] 커뮤니티 게시글 좋아요 순 전체 조회(모집 여부 X)")
+        void selectAllLikeDescPostList_Success() throws Exception {
 
-            given(projectStudyService.getProjectStudyList(category.getId(), pageable, user.getId(), LIKES))
+            given(projectStudyService.getProjectStudyLikesList(category.getId(), pageable, user.getId(), ALL))
                     .willReturn(posts);
 
             mockMvc.perform(
-                            get("/projectstudy/list/likes/4"))
+                            get("/projectstudy/list/all/likes/4"))
                     .andDo(print())
                     .andExpect(status().isOk());
 
-            verify(projectStudyService).getProjectStudyList(anyLong(), any(Pageable.class), anyLong(), eq(LIKES));
+            verify(projectStudyService).getProjectStudyLikesList(anyLong(), any(Pageable.class), anyLong(), eq(ALL));
+        }
+
+        @Test
+        @WithMockCustomUser
+        @DisplayName("[성공] 커뮤니티 게시글 좋아요 순 전체 조회(모집 중)")
+        void selectOpenedLikeDescPostList_Success() throws Exception {
+
+            given(projectStudyService.getProjectStudyLikesList(category.getId(), pageable, user.getId(), OPENED))
+                    .willReturn(posts);
+
+            mockMvc.perform(
+                            get("/projectstudy/list/opened/likes/4"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+
+            verify(projectStudyService).getProjectStudyLikesList(anyLong(), any(Pageable.class), anyLong(), eq(OPENED));
         }
 
         @Test
