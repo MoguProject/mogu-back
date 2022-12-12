@@ -88,6 +88,9 @@ public class ProjectStudyDto {
         @ApiModelProperty(notes = "작성자 닉네임")
         private String userNickname;
 
+        @ApiModelProperty(notes = "작성자 프로필 사진")
+        private String userProfileImage;
+
         @ApiModelProperty(notes = "카테고리 이름")
         private String categoryName;
 
@@ -153,6 +156,7 @@ public class ProjectStudyDto {
             this.userId = post.getUser().getId();
             this.categoryId = post.getCategory().getId();
             this.userNickname = post.getUser().getNickname();
+            this.userProfileImage = post.getUser().getImage().getImageUrl();
             this.categoryName = post.getCategory().getCategoryName();
             this.title = post.getTitle();
             this.content = post.getContent();
