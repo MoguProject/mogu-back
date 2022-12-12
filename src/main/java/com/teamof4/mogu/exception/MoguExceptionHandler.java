@@ -68,6 +68,13 @@ public class MoguExceptionHandler {
         return USERSKILL_NOT_FOUND;
     }
 
+    @ExceptionHandler(UserDeletedException.class)
+    public final ResponseEntity<String> handleUserDeletedException(
+            UserDeletedException exception) {
+        log.debug("탈퇴한 유저입니다.", exception);
+        return DELETED_USER;
+    }
+
     @ExceptionHandler(ImageNotFoundException.class)
     public final ResponseEntity<String> handleImageNotFoundException(
             ImageNotFoundException exception) {

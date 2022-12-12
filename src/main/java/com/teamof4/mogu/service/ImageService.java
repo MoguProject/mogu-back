@@ -2,7 +2,6 @@ package com.teamof4.mogu.service;
 
 import com.teamof4.mogu.dto.ImageDto;
 import com.teamof4.mogu.entity.Image;
-import com.teamof4.mogu.exception.image.FailedImageUploadException;
 import com.teamof4.mogu.exception.image.ImageNotFoundException;
 import com.teamof4.mogu.repository.ImageRepository;
 import com.teamof4.mogu.util.aws.AwsS3Service;
@@ -30,12 +29,6 @@ public class ImageService {
     public Image getImageById(Long imageId) {
         return imageRepository.findById(imageId)
                 .orElseThrow(ImageNotFoundException::new);
-    }
-
-    @Transactional
-    public Image saveDefaultProfileImage() {
-        return imageRepository.findById(DEFAULT_PROFILE_IMAGE_ID)
-                .orElseThrow(() -> new FailedImageUploadException("기본 이미지를 찾지 못했습니다."));
     }
 
     @Transactional

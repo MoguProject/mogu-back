@@ -58,4 +58,6 @@ public class ResponseConstants {
 
     public static final ResponseEntity<String> NOT_LOGINED_USER =
             new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.NOT_FOUND);
+    public static final ResponseEntity<String> DELETED_USER =
+            new ResponseEntity<>("탈퇴한 유저입니다.", HttpStatus.NOT_FOUND);
 }

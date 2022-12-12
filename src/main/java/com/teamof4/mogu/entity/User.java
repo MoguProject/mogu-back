@@ -53,12 +53,6 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user")
     private List<Like> postLikeds = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Post> posts = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<Reply> replies = new ArrayList<>();
-
     public void setImage(Image image) {
         this.image = image;
     }
