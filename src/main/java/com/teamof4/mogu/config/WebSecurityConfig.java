@@ -33,7 +33,6 @@ public class WebSecurityConfig {
                 .cors()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
 
         return http.build();
