@@ -48,6 +48,9 @@ public class ReplyDto {
         @ApiModelProperty(notes = "댓글 작성자 ID")
         private long userId;
 
+        @ApiModelProperty(notes = "작성자 닉네임")
+        private String userNickname;
+
         @ApiModelProperty(notes = "댓글 내용")
         private String content;
 
@@ -70,6 +73,7 @@ public class ReplyDto {
         public Response(Reply reply, String targetNickname, List<Response> children) {
             this.id = reply.getId();
             this.userId = reply.getUser().getId();
+            this.userNickname = reply.getUser().getNickname();
             this.content = reply.getContent();
             this.createAt = reply.getCreatedAt();
             this.updatedAt = reply.getUpdatedAt();
