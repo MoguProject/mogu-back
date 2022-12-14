@@ -59,6 +59,7 @@ public class User extends BaseTimeEntity {
 
     public LoginInfoResponse toLoginInfoResponse() {
         return LoginInfoResponse.builder()
+                .userId(this.id)
                 .nickname(this.nickname)
                 .profileImageUrl(this.image.getImageUrl())
                 .build();
