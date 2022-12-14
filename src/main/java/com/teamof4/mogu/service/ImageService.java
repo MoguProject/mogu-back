@@ -69,4 +69,5 @@ public class ImageService {
         awsS3Service.deleteImage(fileName);
         imageRepository.delete(targetImage);
     }
+
 }

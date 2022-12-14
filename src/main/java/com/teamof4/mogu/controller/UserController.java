@@ -48,6 +48,8 @@ public class UserController {
                 ResponseCookie.from("access-token", token)
                         .path("/")
                         .httpOnly(true)
+                        .sameSite("none")
+                        .secure(true)
                         .maxAge(12 * (60 * 60) + 9 * (60 * 60))
                         .build();
 
@@ -59,6 +61,8 @@ public class UserController {
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("access-token", null)
                 .path("/")
+                .sameSite("none")
+                .secure(true)
                 .maxAge(0)
                 .build();
 

@@ -1,5 +1,6 @@
 package com.teamof4.mogu.controller;
 
+import com.teamof4.mogu.constants.ResponseConstants;
 import com.teamof4.mogu.entity.Image;
 import com.teamof4.mogu.exception.user.UserNotLoginedException;
 import com.teamof4.mogu.service.ImageService;
@@ -42,4 +43,5 @@ public class ImageController {
         imageService.deletePostImage(imageUrl);
         return ResponseEntity.ok().build();
     }
+
 }
