@@ -84,7 +84,7 @@ public class UserControllerTest {
         given(userService.certificateByEmail(any(EmailCertificationRequest.class))).willReturn("1q2w3e4r");
 
         mockMvc.perform(
-                        post("/user/email/certificate")
+                        post("/users/email/certificate")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(request)))
@@ -103,7 +103,7 @@ public class UserControllerTest {
 
         //andExpect : 기대하는 값이 나왔는지 체크해볼 수 있는 메소드
         mockMvc.perform(
-                        post("/user/create")
+                        post("/users/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(saveRequest)))
@@ -119,7 +119,7 @@ public class UserControllerTest {
         doThrow(new DuplicatedEmailException()).when(userService).create(any(SaveRequest.class));
 
         mockMvc.perform(
-                        post("/user/create")
+                        post("/users/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(saveRequest)))
@@ -135,7 +135,7 @@ public class UserControllerTest {
         doThrow(new DuplicatedNicknameException()).when(userService).create(any(SaveRequest.class));
 
         mockMvc.perform(
-                        post("/user/create")
+                        post("/users/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(saveRequest)))
@@ -151,7 +151,7 @@ public class UserControllerTest {
         doThrow(new DuplicatedPhoneException()).when(userService).create(any(SaveRequest.class));
 
         mockMvc.perform(
-                        post("/user/create")
+                        post("/users/create")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(saveRequest)))
@@ -173,7 +173,7 @@ public class UserControllerTest {
                 .willReturn("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjcwMzMwMDYxLCJleHAiOjE2NzAzNzMyNjF9.Knct2hDifWGO2c7ZSOSI79zKzIt8_eB3wnW7BiwmuJI");
 
         mockMvc.perform(
-                        post("/user/login")
+                        post("/users/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .content(objectMapper.writeValueAsString(loginRequest)))
@@ -198,7 +198,7 @@ public class UserControllerTest {
                 );
 
         mockMvc.perform(
-                        get("/user/mypage")
+                        get("/users/mypage")
                                 .characterEncoding("utf-8"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -222,7 +222,7 @@ public class UserControllerTest {
         doNothing().when(userService).updatePassword(request, 1L);
 
         mockMvc.perform(
-                        put("/user/update/password")
+                        put("/users/update/password")
                                 .characterEncoding("UTF-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -244,7 +244,7 @@ public class UserControllerTest {
         doThrow(new WrongPasswordException()).when(userService).updatePassword(any(UpdatePasswordRequest.class), any(Long.class));
 
         mockMvc.perform(
-                        put("/user/update/password")
+                        put("/users/update/password")
                                 .characterEncoding("UTF-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -266,7 +266,7 @@ public class UserControllerTest {
         doThrow(new AlreadyMyPasswordException()).when(userService).updatePassword(any(UpdatePasswordRequest.class), any(Long.class));
 
         mockMvc.perform(
-                        put("/user/update/password")
+                        put("/users/update/password")
                                 .characterEncoding("UTF-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -287,7 +287,7 @@ public class UserControllerTest {
         doNothing().when(userService).delete(any(DeleteRequest.class), anyLong());
 
         mockMvc.perform(
-                        post("/user/delete")
+                        post("/users/delete")
                                 .characterEncoding("UTF-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestDto)))
@@ -308,7 +308,7 @@ public class UserControllerTest {
         doThrow(new WrongPasswordException()).when(userService).delete(any(DeleteRequest.class), anyLong());
 
         mockMvc.perform(
-                        post("/user/delete")
+                        post("/users/delete")
                                 .characterEncoding("UTF-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestDto)))
@@ -329,7 +329,7 @@ public class UserControllerTest {
 
         doNothing().when(userService).createNewPassword(any(CreatePasswordRequest.class));
 
-        mockMvc.perform(post("/user/email/create/new-password")
+        mockMvc.perform(post("/users/email/create/new-password")
                         .characterEncoding("UTF-8")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -351,7 +351,7 @@ public class UserControllerTest {
                 .when(userService).createNewPassword(any(CreatePasswordRequest.class));
 
         mockMvc.perform(
-                        post("/user/email/create/new-password")
+                        post("/users/email/create/new-password")
                                 .characterEncoding("UTF-8")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -372,7 +372,7 @@ public class UserControllerTest {
                 .willReturn(response);
 
         mockMvc.perform(
-                        get("/user/mypage/post/project")
+                        get("/users/mypage/post/project")
                                 .characterEncoding("UTF-8")
                                 .param("size", "10")
                                 .param("page", "0"))
@@ -393,7 +393,7 @@ public class UserControllerTest {
                 .willReturn(response);
 
         mockMvc.perform(
-                        get("/user/mypage/post/study")
+                        get("/users/mypage/post/study")
                                 .characterEncoding("UTF-8")
                                 .param("size", "10")
                                 .param("page", "0"))
@@ -415,7 +415,7 @@ public class UserControllerTest {
                 .willReturn(response);
 
         mockMvc.perform(
-                        get("/user/mypage/post/liked")
+                        get("/users/mypage/post/liked")
                                 .characterEncoding("UTF-8")
                                 .param("size", "10")
                                 .param("page", "0"))
@@ -437,7 +437,7 @@ public class UserControllerTest {
                 .willReturn(response);
 
         mockMvc.perform(
-                        get("/user/mypage/post/replied")
+                        get("/users/mypage/post/replied")
                                 .characterEncoding("UTF-8")
                                 .param("size", "10")
                                 .param("page", "0"))
