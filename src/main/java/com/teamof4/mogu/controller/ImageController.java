@@ -1,5 +1,6 @@
 package com.teamof4.mogu.controller;
 
+import com.teamof4.mogu.dto.ImageDto;
 import com.teamof4.mogu.entity.Image;
 import com.teamof4.mogu.exception.user.UserNotLoginedException;
 import com.teamof4.mogu.service.ImageService;
@@ -27,19 +28,19 @@ public class ImageController {
             throw new UserNotLoginedException();
         }
 
-        Image image = imageService.savePostImage(multipartFile);
+        Image image = imageService.saveImagesFromEditor(multipartFile, userId);
         return ResponseEntity.ok(image.getImageUrl());
     }
 
-    @PostMapping("/delete/{imageUrl}")
+    @PostMapping("/delete")
     @ApiOperation(value = "에디터 이미지 삭제")
-    public ResponseEntity<Void> deleteImage(@PathVariable String imageUrl,
+    public ResponseEntity<Void> deleteImage(@RequestBody ImageDto dto,
                                             @AuthenticationPrincipal Long userId) {
         if (userId == null) {
             throw new UserNotLoginedException();
         }
 
-        imageService.deletePostImage(imageUrl);
+        imageService.deletePostImage(dto.getImageUrl(), userId);
         return ResponseEntity.ok().build();
     }
 }
