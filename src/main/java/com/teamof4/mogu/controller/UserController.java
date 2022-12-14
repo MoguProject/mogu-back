@@ -26,7 +26,7 @@ import static com.teamof4.mogu.dto.UserDto.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/users")
 @Api(tags = {"01. User API"})
 public class UserController {
 
@@ -46,6 +46,7 @@ public class UserController {
         String token = userService.login(requestDto);
         ResponseCookie cookie =
                 ResponseCookie.from("access-token", token)
+                        .httpOnly(true)
                         .path("/")
                         .maxAge(12 * (60 * 60) + 9 * (60 * 60))
                         .build();
@@ -57,6 +58,7 @@ public class UserController {
     @ApiOperation(value = "사용자 로그아웃")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("access-token", null)
+                .httpOnly(true)
                 .path("/")
                 .maxAge(0)
                 .build();
