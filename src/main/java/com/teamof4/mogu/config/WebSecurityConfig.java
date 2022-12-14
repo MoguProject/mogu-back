@@ -55,7 +55,6 @@ public class WebSecurityConfig {
         configuration.addAllowedOriginPattern(ALLOWED_ORIGIN_PATTERNS);
         configuration.addAllowedHeader(ALLOWED_HEADERS);
         configuration.addAllowedMethod(ALLOWED_METHODS);
-        configuration.setAllowCredentials(true);
         configuration.setMaxAge(MAX_AGE_SECOND);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
