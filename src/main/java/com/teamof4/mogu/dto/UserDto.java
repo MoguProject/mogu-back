@@ -103,6 +103,9 @@ public class UserDto {
     @Getter
     @Builder
     public static class LoginInfoResponse {
+        @ApiModelProperty(notes = "로그인 유저 id")
+        private Long userId;
+
         @ApiModelProperty(notes = "로그인 유저 닉네임")
         private String nickname;
 
