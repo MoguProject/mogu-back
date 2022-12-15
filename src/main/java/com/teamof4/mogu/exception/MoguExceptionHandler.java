@@ -75,6 +75,13 @@ public class MoguExceptionHandler {
         return DELETED_USER;
     }
 
+    @ExceptionHandler(WrongEmailOrNameException.class)
+    public final ResponseEntity<String> handleWrongEmailOrNameException(
+            WrongEmailOrNameException exception) {
+        log.debug("이메일 혹은 이름을 잘못 입력했습니다.", exception);
+        return WRONG_EMAIL_OR_NAME;
+    }
+
     @ExceptionHandler(ImageNotFoundException.class)
     public final ResponseEntity<String> handleImageNotFoundException(
             ImageNotFoundException exception) {

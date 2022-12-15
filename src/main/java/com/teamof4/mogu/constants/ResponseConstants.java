@@ -60,4 +60,6 @@ public class ResponseConstants {
             new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.NOT_FOUND);
     public static final ResponseEntity<String> DELETED_USER =
             new ResponseEntity<>("탈퇴한 유저입니다.", HttpStatus.NOT_FOUND);
+    public static final ResponseEntity<String> WRONG_EMAIL_OR_NAME =
+            new ResponseEntity<>("이메일 혹은 이름을 잘못 입력했습니다.", HttpStatus.NOT_FOUND);
 }
